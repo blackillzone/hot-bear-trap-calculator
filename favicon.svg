@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Tige verte -->
+  <path d="M38 6 C38 6 36 2 32 2 C28 2 27 5 28 8 C29 11 32 12 34 10" fill="none" stroke="#2d8a2d" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Feuille -->
+  <path d="M34 10 C38 7 43 9 42 13 C40 17 35 14 34 10Z" fill="#3aaa3a"/>
+  <!-- Corps du piment -->
+  <path d="M30 11 C22 13 14 22 13 32 C12 40 16 50 22 55 C25 57 27 57 29 55 C31 57 33 57 35 55 C41 50 45 40 44 32 C43 22 38 13 30 11Z" fill="#e02020"/>
+  <!-- Reflet -->
+  <path d="M22 20 C19 26 19 34 21 40" fill="none" stroke="#ff6060" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <!-- Pointe -->
+  <path d="M29 55 C28 59 30 62 32 62 C34 62 36 59 35 55" fill="#c01818"/>
+</svg>
