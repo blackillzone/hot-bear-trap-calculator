@@ -68,7 +68,9 @@ export function UserDataPage() {
 
   function updateHero(name: HeroName, patch: Partial<OwnedHeroData>) {
     const current = ownedHeroes[name] ?? defaultOwnedHeroData();
-    updateProfile({ ownedHeroes: { ...ownedHeroes, [name]: { ...current, ...patch } } });
+    // Auto-own when the user edits any field
+    const owned = current.owned ? {} : { owned: true };
+    updateProfile({ ownedHeroes: { ...ownedHeroes, [name]: { ...current, ...owned, ...patch } } });
   }
 
   return (
