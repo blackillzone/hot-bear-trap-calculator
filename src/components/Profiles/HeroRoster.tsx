@@ -198,7 +198,7 @@ function HeroCard({
   name: HeroName;
   isOwned: boolean;
   isSelected: boolean;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent) => void;
   onToggleOwned: () => void;
 }) {
   const [imgError, setImgError] = useState(false);
@@ -209,7 +209,7 @@ function HeroCard({
 
   return (
     <button
-      onClick={onClick}
+      onClick={e => onClick(e)}
       title={name}
       className={clsx(
         'flex flex-col w-full rounded-lg overflow-hidden border-2 transition-all duration-150 cursor-pointer bg-gray-900',
@@ -443,12 +443,12 @@ export function HeroDetailPanel({
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+    <div className="bg-gray-900 border border-gray-800">
       {/* Header */}
       <div className="flex items-start justify-between px-3 py-2 border-b border-gray-800">
         <div className="min-w-0 pr-2">
-          <h3 className="text-lg font-bold text-white leading-tight">{name}</h3>
-          <p className="text-sm text-gray-500 leading-snug mt-0.5 line-clamp-2">{hero.description}</p>
+          <h3 className="text-base font-bold text-white leading-tight">{name}</h3>
+          <p className="text-xs text-gray-500 leading-snug mt-0.5 line-clamp-1">{hero.description}</p>
         </div>
         <button
           onClick={onClose}
@@ -639,13 +639,45 @@ const GEN_FILTERS: { id: FilterGen; label: string; idle: string; active: string 
   { id: 'rare', label: 'Rare', idle: 'text-sky-400/80    hover:text-sky-300    hover:bg-sky-950/60',    active: 'bg-sky-600    text-white' },
 ];
 
+// ─── computeFilteredHeroes (pure helper, also used in effects) ──────────────
+function computeFilteredHeroes(filterClass: FilterClass, filterGen: FilterGen): HeroName[] {
+  const filterByGen = (name: HeroName) => {
+    if (filterGen === 'all') return true;
+    const gen = HERO_DB[name].generation;
+    if (filterGen === 'epic') return gen === 'epic';
+    if (filterGen === 'rare') return gen === 'rare';
+    return String(gen) === filterGen;
+  };
+  const groups = filterClass === 'all'
+    ? (() => {
+        const heroes = ALL_HEROES_SORTED.filter(filterByGen);
+        return heroes.length > 0 ? [{ heroes }] : [];
+      })()
+    : HERO_GROUPS
+        .filter(g => g.label === CLASS_GROUP_LABEL[filterClass])
+        .map(g => ({
+          heroes: g.heroes
+            .filter(filterByGen)
+            .sort((a, b) => {
+              const ga = heroGenOrder(HERO_DB[a].generation);
+              const gb = heroGenOrder(HERO_DB[b].generation);
+              if (ga !== gb) return ga - gb;
+              return a.localeCompare(b);
+            }),
+        }))
+        .filter(g => g.heroes.length > 0);
+  return groups.flatMap(g => g.heroes);
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 export function HeroRoster({
   selectedHero,
   setSelectedHero,
+  onFilteredHeroesChange,
 }: {
   selectedHero: HeroName | null;
-  setSelectedHero: (hero: HeroName | null) => void;
+  setSelectedHero: (hero: HeroName | null, dir?: 'left' | 'right') => void;
+  onFilteredHeroesChange?: (heroes: HeroName[]) => void;
 }) {
   const activeProfile = useRallyStore(s => s.activeProfile);
   const updateProfile  = useRallyStore(s => s.updateProfile);
@@ -654,6 +686,55 @@ export function HeroRoster({
   const [gridKey,     setGridKey]     = useState(0);
   const [exiting,     setExiting]     = useState(false);
   const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Ref bridge: updated every render so the keydown handler always reads the current filtered list
+  const filteredHeroesRef = useRef<HeroName[]>([]);
+
+  // Keyboard navigation between heroes
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      const arrows = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+      if (!selectedHero || !arrows.includes(e.key)) return;
+      // Don't hijack inputs/sliders inside the detail panel
+      if ((e.target as HTMLElement).closest('input, [role="slider"]')) return;
+      const heroes = filteredHeroesRef.current;
+      const idx = heroes.indexOf(selectedHero);
+      if (idx === -1) return;
+      e.preventDefault();
+
+      if (e.key === 'ArrowLeft' && idx > 0)
+        return setSelectedHero(heroes[idx - 1], 'left');
+      if (e.key === 'ArrowRight' && idx < heroes.length - 1)
+        return setSelectedHero(heroes[idx + 1], 'right');
+
+      // Up / Down: determine column count from the live grid
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        const card = document.querySelector(`[data-hero="${selectedHero}"]`);
+        const grid = card?.closest('.hero-cols-grid') as HTMLElement | null;
+        const cols = grid
+          ? getComputedStyle(grid).gridTemplateColumns.trim().split(/\s+/).length
+          : 4;
+        if (e.key === 'ArrowUp' && idx - cols >= 0)
+          setSelectedHero(heroes[idx - cols], 'left');
+        else if (e.key === 'ArrowDown' && idx + cols < heroes.length)
+          setSelectedHero(heroes[idx + cols], 'right');
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedHero, setSelectedHero]);
+
+  // Scroll selected card into view when navigating with keyboard
+  useEffect(() => {
+    if (!selectedHero) return;
+    const raf = requestAnimationFrame(() => {
+      document.querySelector(`[data-hero="${selectedHero}"]`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [selectedHero]);
+
+  useEffect(() => {
+    onFilteredHeroesChange?.(computeFilteredHeroes(filterClass, filterGen));
+  }, [filterClass, filterGen, onFilteredHeroesChange]);
 
   function applyFilter(fn: () => void) {
     setExiting(true);
@@ -678,12 +759,13 @@ export function HeroRoster({
     updateProfile({ ownedHeroes: { ...ownedHeroes, [name]: { ...data, owned: !data.owned } } });
   }
 
-  function handleCardClick(name: HeroName) {
+  function handleCardClick(name: HeroName, e: React.MouseEvent) {
     const data = getHeroData(name);
     if (!data.owned) {
       updateProfile({ ownedHeroes: { ...ownedHeroes, [name]: { ...data, owned: true, stars: 0, starSubLevel: 2 } } });
     }
-    setSelectedHero(selectedHero === name ? null : name);
+    const dir: 'left' | 'right' = e.clientX < window.innerWidth / 2 ? 'left' : 'right';
+    setSelectedHero(selectedHero === name ? null : name, dir);
   }
 
   const filterByGen = (name: HeroName) => {
@@ -715,6 +797,7 @@ export function HeroRoster({
         .filter(g => g.heroes.length > 0);
 
   const filteredHeroes = filteredGroups.flatMap(g => g.heroes);
+  filteredHeroesRef.current = filteredHeroes;
   const allOwned = filteredHeroes.length > 0 && filteredHeroes.every(n => getHeroData(n).owned);
 
   function toggleAllOwned() {
@@ -791,10 +874,11 @@ export function HeroRoster({
                   {group.label}
                 </p>
               )}
-              <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5">
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 hero-cols-grid">
                 {group.heroes.map((name, i) => (
                   <div
                     key={name}
+                    data-hero={name}
                     className="hero-grid-enter"
                     style={{ animationDelay: exiting ? '0ms' : `${i * 22}ms` }}
                   >
@@ -802,7 +886,7 @@ export function HeroRoster({
                       name={name}
                       isOwned={getHeroData(name).owned}
                       isSelected={selectedHero === name}
-                      onClick={() => handleCardClick(name)}
+                      onClick={e => handleCardClick(name, e)}
                       onToggleOwned={() => toggleOwned(name)}
                     />
                   </div>

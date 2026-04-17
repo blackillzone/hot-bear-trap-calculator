@@ -54,11 +54,13 @@ function GovernorGearEditor() {
 export function GovDataEditor({
   selectedHero,
   setSelectedHero,
+  onFilteredHeroesChange,
   activeTab,
   setActiveTab,
 }: {
   selectedHero: HeroName | null;
-  setSelectedHero: (h: HeroName | null) => void;
+  setSelectedHero: (h: HeroName | null, dir?: 'left' | 'right') => void;
+  onFilteredHeroesChange?: (heroes: HeroName[]) => void;
   activeTab: Tab;
   setActiveTab: (t: Tab) => void;
 }) {
@@ -74,6 +76,7 @@ export function GovDataEditor({
           <HeroRoster
             selectedHero={selectedHero}
             setSelectedHero={setSelectedHero}
+            onFilteredHeroesChange={onFilteredHeroesChange}
           />
         )}
         {activeTab === 'gov-gear'     && <GovernorGearEditor />}
