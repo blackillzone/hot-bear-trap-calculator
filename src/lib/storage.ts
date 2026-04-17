@@ -1,4 +1,8 @@
-import type { PlayerProfile, TroopStats, WidgetStats, WidgetLevels } from '../types';
+import type {
+  PlayerProfile, TroopStats, WidgetStats, WidgetLevels,
+  OwnedHeroData, HeroGearSlot, GovGearData, StaticBonuses, TroopInventory, TroopLevel,
+} from '../types';
+import { TROOP_LEVELS, HERO_GEAR_SLOTS } from '../types';
 
 const PROFILES_KEY = 'ks_profiles';
 const ACTIVE_KEY = 'ks_active_profile';
@@ -16,10 +20,15 @@ export function loadProfiles(): PlayerProfile[] {
   try {
     const raw = localStorage.getItem(PROFILES_KEY);
     const profiles = raw ? (JSON.parse(raw) as PlayerProfile[]) : [];
-    // Migrate: ensure every profile has widget_levels (added in v2)
+    // Migrate: ensure every profile has all fields from newer versions
     return profiles.map(p => ({
       ...p,
-      widget_levels: p.widget_levels ?? defaultWidgetLevels(),
+      widget_levels:  p.widget_levels  ?? defaultWidgetLevels(),
+      ownedHeroes:    p.ownedHeroes    ?? {},
+      govGear:        p.govGear        ?? defaultGovGear(),
+      govCharmLevel:  p.govCharmLevel  ?? 0,
+      staticBonuses:  p.staticBonuses  ?? defaultStaticBonuses(),
+      troops:         p.troops         ?? defaultTroops(),
     }));
   } catch {
     return [];
@@ -42,6 +51,11 @@ export function createProfile(name: string): PlayerProfile {
     troop_tier: 'T10',
     tg_level: 0,
     rally_capacity: 2_000_000,
+    ownedHeroes: {},
+    govGear: defaultGovGear(),
+    govCharmLevel: 0,
+    staticBonuses: defaultStaticBonuses(),
+    troops: defaultTroops(),
   };
 }
 
@@ -121,4 +135,66 @@ export function defaultWidgets(): WidgetStats {
 
 export function defaultWidgetLevels(): WidgetLevels {
   return { inf: 0, cav: 0, arc: 0 };
+}
+
+export function defaultHeroGear(): Record<HeroGearSlot, { level: number; masteryLevel: number }> {
+  return {
+    helm:    { level: 0, masteryLevel: 0 },
+    gloves:  { level: 0, masteryLevel: 0 },
+    shroud:  { level: 0, masteryLevel: 0 },
+    greaves: { level: 0, masteryLevel: 0 },
+  };
+}
+
+export function defaultOwnedHeroData(): OwnedHeroData {
+  return {
+    owned: false,
+    level: 1,
+    stars: 0,
+    starSubLevel: 1,
+    widgetLevel: 0,
+    gear: defaultHeroGear(),
+  };
+}
+
+export function defaultGovGear(): GovGearData {
+  return { helm: 0, gloves: 0, shroud: 0, greaves: 0 };
+}
+
+export function defaultStaticBonuses(): StaticBonuses {
+  return {
+    squad_atk: 0, squad_def: 0, squad_let: 0, squad_hp: 0,
+    inf_atk:   0, inf_def:   0, inf_let:   0, inf_hp:   0,
+    cav_atk:   0, cav_def:   0, cav_let:   0, cav_hp:   0,
+    arc_atk:   0, arc_def:   0, arc_let:   0, arc_hp:   0,
+  };
+}
+
+export function defaultTroops(): TroopInventory {
+  const emptyTierRecord = () =>
+    Object.fromEntries(TROOP_LEVELS.map(l => [l, 0])) as Record<TroopLevel, number>;
+  return {
+    inf: emptyTierRecord(),
+    cav: emptyTierRecord(),
+    arc: emptyTierRecord(),
+  };
+}
+
+// Ensure that a partially-loaded OwnedHeroData from localStorage has all fields
+export function migrateOwnedHeroData(raw: Partial<OwnedHeroData>): OwnedHeroData {
+  const def = defaultOwnedHeroData();
+  return {
+    owned:        raw.owned        ?? def.owned,
+    level:        raw.level        ?? def.level,
+    stars:        raw.stars        ?? def.stars,
+    starSubLevel: raw.starSubLevel ?? def.starSubLevel,
+    widgetLevel:  raw.widgetLevel  ?? def.widgetLevel,
+    gear: HERO_GEAR_SLOTS.reduce((acc, slot) => {
+      acc[slot] = {
+        level:        raw.gear?.[slot]?.level        ?? 0,
+        masteryLevel: raw.gear?.[slot]?.masteryLevel ?? 0,
+      };
+      return acc;
+    }, {} as Record<HeroGearSlot, { level: number; masteryLevel: number }>),
+  };
 }

@@ -46,7 +46,7 @@ export function ProfileManager() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4">
+    <div className="max-w-5xl mx-auto">
       <SectionCard title="Saved Profiles" icon={<User size={15} />}>
         <div className="space-y-2">
           {profiles.map(p => (

@@ -9,12 +9,12 @@ type HeroGen = number | 'epic' | 'rare' | null;
 
 // All G-badges → orange / Epic → violet / Rare → blue
 const GEN_CONFIG: Record<string, { label: string; cls: string }> = {
-  '1': { label: 'G1', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
-  '2': { label: 'G2', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
-  '3': { label: 'G3', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
-  '4': { label: 'G4', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
-  '5': { label: 'G5', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
-  '6': { label: 'G6', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
+  '1': { label: 'S1', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
+  '2': { label: 'S2', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
+  '3': { label: 'S3', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
+  '4': { label: 'S4', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
+  '5': { label: 'S5', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
+  '6': { label: 'S6', cls: 'bg-orange-500/20 text-orange-300 border border-orange-500/40' },
   epic: { label: 'Epic', cls: 'bg-violet-500/20 text-violet-300 border border-violet-500/40' },
   rare: { label: 'Rare', cls: 'bg-blue-500/20 text-blue-300 border border-blue-500/40' },
 };

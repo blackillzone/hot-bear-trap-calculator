@@ -22,7 +22,9 @@ interface RallyStore {
   result: FormationResult | null;
 
   // ── UI ────────────────────────────────────────────────────────────────────
-  activeTab: 'formation' | 'participants' | 'profiles' | 'guide';
+  activeView: 'profiles' | 'bear-trap' | 'user-data';
+  activeTab: 'formation' | 'participants' | 'guide';
+  userDataTab: 'heroes' | 'gov-gear' | 'static-stats' | 'troops';
 
   // ── Profile Actions ───────────────────────────────────────────────────────
   newProfile: (name: string) => void;
@@ -35,7 +37,9 @@ interface RallyStore {
   setJoiner: (slot: 0 | 1 | 2 | 3, update: Partial<JoinerSlot>) => void;
 
   // ── UI Actions ────────────────────────────────────────────────────────────
+  setActiveView: (view: RallyStore['activeView']) => void;
   setActiveTab: (tab: RallyStore['activeTab']) => void;
+  setUserDataTab: (tab: RallyStore['userDataTab']) => void;
 }
 
 // ─── Initial State ────────────────────────────────────────────────────────────
@@ -95,7 +99,9 @@ export const useRallyStore = create<RallyStore>()(
       // Load capacity from the persisted profile (fallback to default)
       rallyConfig: { ...DEFAULT_RALLY, capacity: activeProfile.rally_capacity ?? DEFAULT_RALLY.capacity },
       result: computeResult(activeProfile, { ...DEFAULT_RALLY, capacity: activeProfile.rally_capacity ?? DEFAULT_RALLY.capacity }),
-      activeTab: 'formation',
+      activeView: 'user-data' as const,
+      activeTab: 'formation' as const,
+      userDataTab: 'heroes' as const,
 
       // ── Profile Actions ─────────────────────────────────────────────────
       newProfile: (name: string) => {
@@ -187,7 +193,9 @@ export const useRallyStore = create<RallyStore>()(
       },
 
       // ── UI Actions ──────────────────────────────────────────────────────
+      setActiveView: (view) => set({ activeView: view }),
       setActiveTab: (tab) => set({ activeTab: tab }),
+      setUserDataTab: (tab) => set({ userDataTab: tab }),
     };
   })
 );
