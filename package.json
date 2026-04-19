@@ -9,7 +9,10 @@
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "lint:ci": "biome ci .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "knip": "knip",
+    "knip:fix": "knip --fix",
+    "knip:ci": "knip --production"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
@@ -26,8 +29,8 @@
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@types/recharts": "^1.8.29",
     "@vitejs/plugin-react": "^6.0.1",
+    "knip": "^6.4.1",
     "typescript": "~6.0.2",
     "vite": "^8.0.4"
   }

@@ -124,22 +124,4 @@ export function SectionCard({ title, icon, children, className }: SectionCardPro
   );
 }
 
-interface BadgeProps {
-  children: ReactNode;
-  color?: 'orange' | 'blue' | 'purple' | 'green' | 'gray';
-}
 
-export function Badge({ children, color = 'gray' }: BadgeProps) {
-  const colors = {
-    orange: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-    blue: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-    purple: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-    green: 'bg-green-500/10 text-green-400 border-green-500/20',
-    gray: 'bg-gray-700 text-gray-300 border-gray-600',
-  };
-  return (
-    <span className={clsx('text-xs px-2 py-0.5 rounded-full border font-medium', colors[color])}>
-      {children}
-    </span>
-  );
-}

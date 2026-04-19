@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import type { PlayerProfile, RallyConfig, FormationResult, HeroName, JoinerSlot } from '../types';
+import type { PlayerProfile, RallyConfig, FormationResult, JoinerSlot } from '../types';
 import {
   loadProfiles, saveProfiles, loadActiveProfileId, saveActiveProfileId,
   createProfile, upsertProfile, deleteProfile, defaultStats, defaultWidgets,
@@ -204,6 +204,5 @@ export const useRallyStore = create<RallyStore>()(
 
 export const selectStats = (s: RallyStore) => s.activeProfile?.stats ?? defaultStats();
 export const selectWidgets = (s: RallyStore) => s.activeProfile?.widgets ?? defaultWidgets();
-export const selectHeroes = (s: RallyStore) => s.activeProfile?.heroes ?? { inf: 'None' as HeroName, cav: 'None' as HeroName, arc: 'None' as HeroName };
 export const selectTier = (s: RallyStore) => s.activeProfile?.troop_tier ?? 'T10';
 export const selectTG = (s: RallyStore) => s.activeProfile?.tg_level ?? 0;

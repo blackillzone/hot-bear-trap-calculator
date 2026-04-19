@@ -7,7 +7,7 @@ import { getJoinerAtkAllBonus, getJoinerLetAllBonus } from './heroes';
  * Compute the combined "Attack Factor" A for a troop type.
  * A = (1 + atk/100) × (1 + let/100)
  */
-export function attackFactor(atk: number, let_: number): number {
+function attackFactor(atk: number, let_: number): number {
   return (1 + atk / 100) * (1 + let_ / 100);
 }
 
@@ -17,7 +17,7 @@ export function attackFactor(atk: number, let_: number): number {
  * Extra archer multiplier for T>6 and TG3+ troops (additional 1.1 on top of base 1.1).
  * Ref: Frakinator documentation.
  */
-export function archerTierMultiplier(tier: TroopTier, tg: TGLevel): number {
+function archerTierMultiplier(tier: TroopTier, tg: TGLevel): number {
   const baseMult = 1.1; // archers always do +10% vs infantry (bear troops)
   const isTierHighEnough = tier === 'T7-T9' || tier === 'T10' || tier === 'T11';
   const isTGHighEnough = tg >= 3;
@@ -110,7 +110,7 @@ export function computeDamageScore(
  * compute exact troop counts per participant and totals.
  * Rounding to nearest 100.
  */
-export function computeDistribution(
+function computeDistribution(
   capacity: number,
   participants: number,
   ratio: OptimalRatio
@@ -204,6 +204,4 @@ export function formatTroops(n: number): string {
   return n.toString();
 }
 
-export function formatPercent(n: number): string {
-  return `${(n * 100).toFixed(1)}%`;
-}
+

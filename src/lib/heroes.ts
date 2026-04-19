@@ -6,16 +6,16 @@ import type { HeroName, TroopType, JoinerSlot } from '../types';
  * 'rally_let' – increases Rally troops' LET%
  * 'none'      – no rally-relevant widget (defender/health/defense type or no gear)
  */
-export type HeroWidgetEffect = 'rally_atk' | 'rally_let' | 'none';
+type HeroWidgetEffect = 'rally_atk' | 'rally_let' | 'none';
 
 /**
  * 'atk_all'  – adds X% Attack to ALL troop types (Amane "Tri Phalanx")
  * 'let_all'  – adds X% Lethality to ALL troop types (Chenko, Yeonwoo, Amadeus)
  * 'none'     – no modeled combat effect
  */
-export type JoinerBonusType = 'atk_all' | 'let_all' | 'none';
+type JoinerBonusType = 'atk_all' | 'let_all' | 'none';
 
-export interface HeroData {
+interface HeroData {
   name: HeroName;
   type: TroopType | 'universal';
   /** ATK% bonus contributed to troops of this hero's type (lead hero, level-5 value) */
@@ -344,16 +344,6 @@ export const LEAD_ARC_HEROES: HeroName[] = [
 export const JOINER_HEROES: HeroName[] = [
   'None', 'Amane', 'Chenko', 'Yeonwoo', 'Amadeus',
 ];
-
-/**
- * Get the effective bonus value for a joiner hero at a given skill level.
- * Returns a percentage value (e.g. 20 for 20%).
- */
-export function getJoinerBonus(slot: JoinerSlot): number {
-  const hero = HERO_DB[slot.hero];
-  if (!hero) return 0;
-  return hero.skill_bonuses[slot.skillLevel - 1];
-}
 
 /**
  * Compute the total ATK% bonus added to all troop types (from atk_all joiners).
