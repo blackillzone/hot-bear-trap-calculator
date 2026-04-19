@@ -451,6 +451,13 @@ describe("importProfileFromJson — corrupted input", () => {
     expect(importProfileFromJson("{broken")).toBeNull();
   });
 
+  it("should return null for JSON primitives (not an object)", () => {
+    expect(importProfileFromJson("42")).toBeNull(); // number
+    expect(importProfileFromJson('"string"')).toBeNull(); // string  
+    expect(importProfileFromJson("true")).toBeNull(); // boolean
+    expect(importProfileFromJson("null")).toBeNull(); // null
+  });
+
   it("should return null for JSON without required fields", () => {
     expect(importProfileFromJson(JSON.stringify({ name: "Only name" }))).toBeNull();
   });
