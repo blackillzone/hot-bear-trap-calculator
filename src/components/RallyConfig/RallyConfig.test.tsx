@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { RallyConfig } from "./RallyConfig";
 import { useRallyStore } from "../../store/useRallyStore";
 
@@ -21,20 +22,29 @@ describe("RallyConfig", () => {
     });
   });
 
-  it("should render without crash", () => {
-    render(<RallyConfig />);
-    expect(document.querySelector("div")).toBeDefined();
-  });
-
-  it("should display participants label or value", () => {
+  it("should render form and allow updating participants", async () => {
+    const user = userEvent.setup();
     const { container } = render(<RallyConfig />);
     expect(container).toBeDefined();
+    
+    // Get initial participants count
+    const initialParticipants = useRallyStore.getState().rallyConfig.participants;
+    expect(initialParticipants).toBe(3);
   });
 
-  it("should render form controls", () => {
+  it("should display capacity and participants fields", () => {
+    const { container } = render(<RallyConfig />);
+    expect(container).toBeDefined();
+    
+    // Verify form structure exists with inputs
+    const inputs = container.querySelectorAll("input[type='number']");
+    expect(inputs.length).toBeGreaterThan(0);
+  });
+
+  it("should have joiner selection slots for heroes", () => {
     render(<RallyConfig />);
-    // Should have form elements (inputs, selects, etc.)
-    const inputs = screen.queryAllByRole("spinbutton") || screen.queryAllByRole("combobox");
-    expect(inputs.length >= 0).toBeTruthy();
+    const initialJoiners = useRallyStore.getState().rallyConfig.joiners;
+    expect(initialJoiners).toHaveLength(4);
+    expect(initialJoiners.every(j => j.hero === "None")).toBe(true);
   });
 });

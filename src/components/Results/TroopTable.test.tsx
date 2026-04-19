@@ -52,9 +52,27 @@ describe("TroopTable", () => {
     });
   });
 
-  it("should render without crash with valid result", () => {
+  it("should render table with troop distribution data", () => {
     render(<TroopTable />);
-    expect(screen.getByRole("table")).toBeDefined();
+    const table = screen.getByRole("table");
+    expect(table).toBeDefined();
+    
+    // Verify result has distribution data
+    const result = useRallyStore.getState().result;
+    expect(result).not.toBeNull();
+    expect(result?.distribution).toBeDefined();
+    expect(result?.distribution.inf).toBeGreaterThanOrEqual(0);
+    expect(result?.distribution.cav).toBeGreaterThanOrEqual(0);
+    expect(result?.distribution.arc).toBeGreaterThanOrEqual(0);
+  });
+
+  it("should display troop type rows with correct structure", () => {
+    render(<TroopTable />);
+    
+    // Check for troop type headers
+    expect(screen.getByText("Infantry")).toBeDefined();
+    expect(screen.getByText("Cavalry")).toBeDefined();
+    expect(screen.getByText("Archery")).toBeDefined();
   });
 
   it("should return null when no result available", () => {

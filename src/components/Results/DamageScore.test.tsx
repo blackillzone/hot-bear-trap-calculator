@@ -53,14 +53,29 @@ describe("DamageScore", () => {
     });
   });
 
-  it("should render without crash with valid result", () => {
+  it("should render damage score with title and value", () => {
     const { container } = render(<DamageScore />);
     expect(container.querySelector("h2")).toBeDefined();
+    
+    // Verify result exists with score data
+    const result = useRallyStore.getState().result;
+    expect(result).not.toBeNull();
+    expect(result?.damageScore).toBeDefined();
+    expect(result?.damageScore).toBeGreaterThan(0);
   });
 
-  it("should display improvement percentage", () => {
+  it("should display improvement percentage with plus sign", () => {
     render(<DamageScore />);
-    expect(screen.getByText(/\+/)).toBeDefined();
+    const percentageText = screen.getByText(/\+/);
+    expect(percentageText).toBeDefined();
+    
+    // Verify the score values are numeric
+    const result = useRallyStore.getState().result;
+    if (result) {
+      expect(typeof result.damageScore).toBe("number");
+      expect(typeof result.naiveScore).toBe("number");
+      expect(result.damageScore).toBeGreaterThanOrEqual(result.naiveScore);
+    }
   });
 
   it("should return null when no result available", () => {

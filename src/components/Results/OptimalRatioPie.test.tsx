@@ -52,14 +52,31 @@ describe("OptimalRatioPie", () => {
     });
   });
 
-  it("should render without crash with valid result", () => {
+  it("should render chart with valid result and troop ratio data", () => {
     const { container } = render(<OptimalRatioPie />);
     expect(container).toBeDefined();
+    
+    // Verify result exists with ratio data
+    const result = useRallyStore.getState().result;
+    expect(result).not.toBeNull();
+    expect(result?.ratio).toBeDefined();
+    expect(result?.ratio.inf).toBeGreaterThanOrEqual(0);
+    expect(result?.ratio.cav).toBeGreaterThanOrEqual(0);
+    expect(result?.ratio.arc).toBeGreaterThanOrEqual(0);
   });
 
   it("should return null when no result available", () => {
     useRallyStore.setState({ result: null });
     const { container } = render(<OptimalRatioPie />);
     expect(container.firstChild).toBeNull();
+  });
+
+  it("should verify troop ratios sum approximately to 1.0", () => {
+    const { container } = render(<OptimalRatioPie />);
+    const result = useRallyStore.getState().result;
+    if (result?.ratio) {
+      const total = result.ratio.inf + result.ratio.cav + result.ratio.arc;
+      expect(total).toBeCloseTo(1.0, 1);
+    }
   });
 });
