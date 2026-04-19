@@ -1,4 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npm run lint && npm run knip:ci
+npm run lint:ci
+npm run knip:ci
