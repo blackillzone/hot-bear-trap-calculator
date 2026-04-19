@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RallyConfig } from "./RallyConfig";
 import { useRallyStore } from "../../store/useRallyStore";
@@ -24,8 +24,7 @@ describe("RallyConfig", () => {
     });
   });
 
-  it("should render form and allow updating participants", async () => {
-    const user = userEvent.setup();
+  it("should render form and allow updating participants", () => {
     const { container } = render(<RallyConfig />);
     expect(container).toBeDefined();
     

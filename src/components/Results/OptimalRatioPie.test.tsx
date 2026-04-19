@@ -74,7 +74,7 @@ describe("OptimalRatioPie", () => {
   });
 
   it("should verify troop ratios sum approximately to 1.0", () => {
-    const { container } = render(<OptimalRatioPie />);
+    render(<OptimalRatioPie />);
     const result = useRallyStore.getState().result;
     if (result?.ratio) {
       const total = result.ratio.inf + result.ratio.cav + result.ratio.arc;
