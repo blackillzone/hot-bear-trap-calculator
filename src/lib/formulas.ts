@@ -1,5 +1,15 @@
-import type { TroopStats, WidgetStats, OptimalRatio, FormationResult, TroopDistribution, ParticipantDataPoint, TroopTier, TGLevel, JoinerSlot } from '../types';
-import { getJoinerAtkAllBonus, getJoinerLetAllBonus } from './heroes';
+import type {
+  TroopStats,
+  WidgetStats,
+  OptimalRatio,
+  FormationResult,
+  TroopDistribution,
+  ParticipantDataPoint,
+  TroopTier,
+  TGLevel,
+  JoinerSlot,
+} from "../types";
+import { getJoinerAtkAllBonus, getJoinerLetAllBonus } from "./heroes";
 
 // ─── Attack Factor ────────────────────────────────────────────────────────────
 
@@ -19,7 +29,7 @@ function attackFactor(atk: number, let_: number): number {
  */
 function archerTierMultiplier(tier: TroopTier, tg: TGLevel): number {
   const baseMult = 1.1; // archers always do +10% vs infantry (bear troops)
-  const isTierHighEnough = tier === 'T7-T9' || tier === 'T10' || tier === 'T11';
+  const isTierHighEnough = tier === "T7-T9" || tier === "T10" || tier === "T11";
   const isTGHighEnough = tg >= 3;
   return isTierHighEnough && isTGHighEnough ? baseMult * 1.1 : baseMult;
 }
@@ -43,15 +53,24 @@ export function computeOptimalRatio(
   widgets: WidgetStats,
   tier: TroopTier,
   tg: TGLevel,
-  joiners: JoinerSlot[] = []
+  joiners: JoinerSlot[] = [],
 ): OptimalRatio {
   // Merge widget bonuses into global stats
   // Joiner atk_all adds flat % to every troop type's ATK; let_all adds to every troop type's LET
   const atkAll = getJoinerAtkAllBonus(joiners);
   const letAll = getJoinerLetAllBonus(joiners);
-  const A_inf = attackFactor(stats.inf_atk + widgets.inf_atk + atkAll, stats.inf_let + widgets.inf_let + letAll);
-  const A_cav = attackFactor(stats.cav_atk + widgets.cav_atk + atkAll, stats.cav_let + widgets.cav_let + letAll);
-  const A_arc = attackFactor(stats.arc_atk + widgets.arc_atk + atkAll, stats.arc_let + widgets.arc_let + letAll);
+  const A_inf = attackFactor(
+    stats.inf_atk + widgets.inf_atk + atkAll,
+    stats.inf_let + widgets.inf_let + letAll,
+  );
+  const A_cav = attackFactor(
+    stats.cav_atk + widgets.cav_atk + atkAll,
+    stats.cav_let + widgets.cav_let + letAll,
+  );
+  const A_arc = attackFactor(
+    stats.arc_atk + widgets.arc_atk + atkAll,
+    stats.arc_let + widgets.arc_let + letAll,
+  );
 
   const arcMult = archerTierMultiplier(tier, tg);
 
@@ -86,20 +105,29 @@ export function computeDamageScore(
   ratio: OptimalRatio,
   tier: TroopTier,
   tg: TGLevel,
-  joiners: JoinerSlot[] = []
+  joiners: JoinerSlot[] = [],
 ): number {
   const atkAll = getJoinerAtkAllBonus(joiners);
   const letAll = getJoinerLetAllBonus(joiners);
-  const A_inf = attackFactor(stats.inf_atk + widgets.inf_atk + atkAll, stats.inf_let + widgets.inf_let + letAll);
-  const A_cav = attackFactor(stats.cav_atk + widgets.cav_atk + atkAll, stats.cav_let + widgets.cav_let + letAll);
-  const A_arc = attackFactor(stats.arc_atk + widgets.arc_atk + atkAll, stats.arc_let + widgets.arc_let + letAll);
+  const A_inf = attackFactor(
+    stats.inf_atk + widgets.inf_atk + atkAll,
+    stats.inf_let + widgets.inf_let + letAll,
+  );
+  const A_cav = attackFactor(
+    stats.cav_atk + widgets.cav_atk + atkAll,
+    stats.cav_let + widgets.cav_let + letAll,
+  );
+  const A_arc = attackFactor(
+    stats.arc_atk + widgets.arc_atk + atkAll,
+    stats.arc_let + widgets.arc_let + letAll,
+  );
 
   const arcMult = archerTierMultiplier(tier, tg);
 
   return (
     (A_inf / 3) * Math.sqrt(ratio.inf) +
     A_cav * Math.sqrt(ratio.cav) +
-    ((4.4 / 3) * A_arc * arcMult) * Math.sqrt(ratio.arc)
+    (4.4 / 3) * A_arc * arcMult * Math.sqrt(ratio.arc)
   );
 }
 
@@ -113,7 +141,7 @@ export function computeDamageScore(
 function computeDistribution(
   capacity: number,
   participants: number,
-  ratio: OptimalRatio
+  ratio: OptimalRatio,
 ): TroopDistribution {
   const perParticipant = Math.floor(capacity / participants);
 
@@ -145,16 +173,30 @@ export function computeFormation(
   tg: TGLevel,
   capacity: number,
   participants: number,
-  joiners: JoinerSlot[] = []
+  joiners: JoinerSlot[] = [],
 ): FormationResult {
   const ratio = computeOptimalRatio(stats, widgets, tier, tg, joiners);
   const distribution = computeDistribution(capacity, participants, ratio);
 
-  const damageScore = computeDamageScore(stats, widgets, ratio, tier, tg, joiners);
+  const damageScore = computeDamageScore(
+    stats,
+    widgets,
+    ratio,
+    tier,
+    tg,
+    joiners,
+  );
 
   // Naive equal split for comparison
   const naiveRatio: OptimalRatio = { inf: 1 / 3, cav: 1 / 3, arc: 1 / 3 };
-  const naiveScore = computeDamageScore(stats, widgets, naiveRatio, tier, tg, joiners);
+  const naiveScore = computeDamageScore(
+    stats,
+    widgets,
+    naiveRatio,
+    tier,
+    tg,
+    joiners,
+  );
 
   return {
     ratio,
@@ -176,10 +218,17 @@ export function computeParticipantCurve(
   tier: TroopTier,
   tg: TGLevel,
   capacity: number,
-  joiners: JoinerSlot[] = []
+  joiners: JoinerSlot[] = [],
 ): ParticipantDataPoint[] {
   const ratio = computeOptimalRatio(stats, widgets, tier, tg, joiners);
-  const baseScore = computeDamageScore(stats, widgets, ratio, tier, tg, joiners);
+  const baseScore = computeDamageScore(
+    stats,
+    widgets,
+    ratio,
+    tier,
+    tg,
+    joiners,
+  );
 
   return Array.from({ length: 15 }, (_, i) => {
     const participants = i + 1;
@@ -203,5 +252,3 @@ export function formatTroops(n: number): string {
   if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
   return n.toString();
 }
-
-

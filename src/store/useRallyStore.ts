@@ -1,11 +1,23 @@
-import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
-import type { PlayerProfile, RallyConfig, FormationResult, JoinerSlot } from '../types';
+import { create } from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
+import type {
+  PlayerProfile,
+  RallyConfig,
+  FormationResult,
+  JoinerSlot,
+} from "../types";
 import {
-  loadProfiles, saveProfiles, loadActiveProfileId, saveActiveProfileId,
-  createProfile, upsertProfile, deleteProfile, defaultStats, defaultWidgets,
-} from '../lib/storage';
-import { computeFormation } from '../lib/formulas';
+  loadProfiles,
+  saveProfiles,
+  loadActiveProfileId,
+  saveActiveProfileId,
+  createProfile,
+  upsertProfile,
+  deleteProfile,
+  defaultStats,
+  defaultWidgets,
+} from "../lib/storage";
+import { computeFormation } from "../lib/formulas";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,9 +34,9 @@ interface RallyStore {
   result: FormationResult | null;
 
   // ── UI ────────────────────────────────────────────────────────────────────
-  activeView: 'profiles' | 'bear-trap' | 'user-data';
-  activeTab: 'formation' | 'participants' | 'guide';
-  userDataTab: 'heroes' | 'gov-gear' | 'static-stats' | 'troops';
+  activeView: "profiles" | "bear-trap" | "user-data";
+  activeTab: "formation" | "participants" | "guide";
+  userDataTab: "heroes" | "gov-gear" | "static-stats" | "troops";
 
   // ── Profile Actions ───────────────────────────────────────────────────────
   newProfile: (name: string) => void;
@@ -37,9 +49,9 @@ interface RallyStore {
   setJoiner: (slot: 0 | 1 | 2 | 3, update: Partial<JoinerSlot>) => void;
 
   // ── UI Actions ────────────────────────────────────────────────────────────
-  setActiveView: (view: RallyStore['activeView']) => void;
-  setActiveTab: (tab: RallyStore['activeTab']) => void;
-  setUserDataTab: (tab: RallyStore['userDataTab']) => void;
+  setActiveView: (view: RallyStore["activeView"]) => void;
+  setActiveTab: (tab: RallyStore["activeTab"]) => void;
+  setUserDataTab: (tab: RallyStore["userDataTab"]) => void;
 }
 
 // ─── Initial State ────────────────────────────────────────────────────────────
@@ -49,14 +61,17 @@ const DEFAULT_RALLY: RallyConfig = {
   participants: 15,
   bearLevel: 5,
   joiners: [
-    { hero: 'Amane',   skillLevel: 5 },
-    { hero: 'Chenko',  skillLevel: 5 },
-    { hero: 'Yeonwoo', skillLevel: 5 },
-    { hero: 'None',    skillLevel: 5 },
+    { hero: "Amane", skillLevel: 5 },
+    { hero: "Chenko", skillLevel: 5 },
+    { hero: "Yeonwoo", skillLevel: 5 },
+    { hero: "None", skillLevel: 5 },
   ],
 };
 
-function computeResult(profile: PlayerProfile | null, config: RallyConfig): FormationResult | null {
+function computeResult(
+  profile: PlayerProfile | null,
+  config: RallyConfig,
+): FormationResult | null {
   if (!profile) return null;
   return computeFormation(
     profile.stats,
@@ -65,7 +80,7 @@ function computeResult(profile: PlayerProfile | null, config: RallyConfig): Form
     profile.tg_level,
     config.capacity,
     config.participants,
-    config.joiners
+    config.joiners,
   );
 }
 
@@ -78,30 +93,37 @@ export const useRallyStore = create<RallyStore>()(
     const savedActiveId = loadActiveProfileId();
 
     // Bootstrap: if no profiles exist, create a default one
-    const initialProfiles = profiles.length > 0
-      ? profiles
-      : [createProfile('My Profile')];
+    const initialProfiles =
+      profiles.length > 0 ? profiles : [createProfile("My Profile")];
 
     if (profiles.length === 0) {
       saveProfiles(initialProfiles);
     }
 
-    const activeId = savedActiveId && initialProfiles.find(p => p.id === savedActiveId)
-      ? savedActiveId
-      : initialProfiles[0].id;
+    const activeId =
+      savedActiveId && initialProfiles.find((p) => p.id === savedActiveId)
+        ? savedActiveId
+        : initialProfiles[0].id;
 
-    const activeProfile = initialProfiles.find(p => p.id === activeId) ?? initialProfiles[0];
+    const activeProfile =
+      initialProfiles.find((p) => p.id === activeId) ?? initialProfiles[0];
 
     return {
       profiles: initialProfiles,
       activeProfileId: activeId,
       activeProfile,
       // Load capacity from the persisted profile (fallback to default)
-      rallyConfig: { ...DEFAULT_RALLY, capacity: activeProfile.rally_capacity ?? DEFAULT_RALLY.capacity },
-      result: computeResult(activeProfile, { ...DEFAULT_RALLY, capacity: activeProfile.rally_capacity ?? DEFAULT_RALLY.capacity }),
-      activeView: 'user-data' as const,
-      activeTab: 'formation' as const,
-      userDataTab: 'heroes' as const,
+      rallyConfig: {
+        ...DEFAULT_RALLY,
+        capacity: activeProfile.rally_capacity ?? DEFAULT_RALLY.capacity,
+      },
+      result: computeResult(activeProfile, {
+        ...DEFAULT_RALLY,
+        capacity: activeProfile.rally_capacity ?? DEFAULT_RALLY.capacity,
+      }),
+      activeView: "user-data" as const,
+      activeTab: "formation" as const,
+      userDataTab: "heroes" as const,
 
       // ── Profile Actions ─────────────────────────────────────────────────
       newProfile: (name: string) => {
@@ -118,11 +140,14 @@ export const useRallyStore = create<RallyStore>()(
       },
 
       selectProfile: (id: string) => {
-        const profile = get().profiles.find(p => p.id === id);
+        const profile = get().profiles.find((p) => p.id === id);
         if (!profile) return;
         saveActiveProfileId(id);
         // Restore the capacity saved in this profile
-        const config = { ...get().rallyConfig, capacity: profile.rally_capacity ?? get().rallyConfig.capacity };
+        const config = {
+          ...get().rallyConfig,
+          capacity: profile.rally_capacity ?? get().rallyConfig.capacity,
+        };
         set({
           activeProfileId: id,
           activeProfile: profile,
@@ -147,9 +172,8 @@ export const useRallyStore = create<RallyStore>()(
       removeProfile: (id: string) => {
         const profiles = deleteProfile(get().profiles, id);
         // Ensure at least one profile exists
-        const finalProfiles = profiles.length > 0
-          ? profiles
-          : [createProfile('My Profile')];
+        const finalProfiles =
+          profiles.length > 0 ? profiles : [createProfile("My Profile")];
         if (profiles.length === 0) saveProfiles(finalProfiles);
         else saveProfiles(finalProfiles);
 
@@ -170,7 +194,10 @@ export const useRallyStore = create<RallyStore>()(
         const current = get().activeProfile;
         let activeProfile = current;
         if (partial.capacity !== undefined && current) {
-          const updated: PlayerProfile = { ...current, rally_capacity: partial.capacity };
+          const updated: PlayerProfile = {
+            ...current,
+            rally_capacity: partial.capacity,
+          };
           const profiles = upsertProfile(get().profiles, updated);
           saveProfiles(profiles);
           activeProfile = updated;
@@ -183,7 +210,9 @@ export const useRallyStore = create<RallyStore>()(
       },
 
       setJoiner: (slot: 0 | 1 | 2 | 3, update: Partial<JoinerSlot>) => {
-        const joiners = [...get().rallyConfig.joiners] as RallyConfig['joiners'];
+        const joiners = [
+          ...get().rallyConfig.joiners,
+        ] as RallyConfig["joiners"];
         joiners[slot] = { ...joiners[slot], ...update };
         const config = { ...get().rallyConfig, joiners };
         set({
@@ -197,12 +226,15 @@ export const useRallyStore = create<RallyStore>()(
       setActiveTab: (tab) => set({ activeTab: tab }),
       setUserDataTab: (tab) => set({ userDataTab: tab }),
     };
-  })
+  }),
 );
 
 // ─── Derived Selectors ────────────────────────────────────────────────────────
 
-export const selectStats = (s: RallyStore) => s.activeProfile?.stats ?? defaultStats();
-export const selectWidgets = (s: RallyStore) => s.activeProfile?.widgets ?? defaultWidgets();
-export const selectTier = (s: RallyStore) => s.activeProfile?.troop_tier ?? 'T10';
+export const selectStats = (s: RallyStore) =>
+  s.activeProfile?.stats ?? defaultStats();
+export const selectWidgets = (s: RallyStore) =>
+  s.activeProfile?.widgets ?? defaultWidgets();
+export const selectTier = (s: RallyStore) =>
+  s.activeProfile?.troop_tier ?? "T10";
 export const selectTG = (s: RallyStore) => s.activeProfile?.tg_level ?? 0;

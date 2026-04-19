@@ -1,20 +1,50 @@
 // ─── Troop Types ─────────────────────────────────────────────────────────────
-export type TroopType = 'inf' | 'cav' | 'arc';
+export type TroopType = "inf" | "cav" | "arc";
 
-export type TroopTier = 'T1-T6' | 'T7-T9' | 'T10' | 'T11';
+export type TroopTier = "T1-T6" | "T7-T9" | "T10" | "T11";
 
 export type TGLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 /** Individual troop levels (T1–T10 standard, TG1–TG8 Truegold grades) */
 export type TroopLevel =
-  | 'T1' | 'T2' | 'T3' | 'T4' | 'T5'
-  | 'T6' | 'T7' | 'T8' | 'T9' | 'T10'
-  | 'TG1' | 'TG2' | 'TG3' | 'TG4'
-  | 'TG5' | 'TG6' | 'TG7' | 'TG8';
+  | "T1"
+  | "T2"
+  | "T3"
+  | "T4"
+  | "T5"
+  | "T6"
+  | "T7"
+  | "T8"
+  | "T9"
+  | "T10"
+  | "TG1"
+  | "TG2"
+  | "TG3"
+  | "TG4"
+  | "TG5"
+  | "TG6"
+  | "TG7"
+  | "TG8";
 
 export const TROOP_LEVELS: TroopLevel[] = [
-  'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10',
-  'TG1', 'TG2', 'TG3', 'TG4', 'TG5', 'TG6', 'TG7', 'TG8',
+  "T1",
+  "T2",
+  "T3",
+  "T4",
+  "T5",
+  "T6",
+  "T7",
+  "T8",
+  "T9",
+  "T10",
+  "TG1",
+  "TG2",
+  "TG3",
+  "TG4",
+  "TG5",
+  "TG6",
+  "TG7",
+  "TG8",
 ];
 
 /** Number of troops per type per level */
@@ -25,15 +55,20 @@ export type TroopInventory = {
 };
 
 // ─── Hero Gear ────────────────────────────────────────────────────────────────
-export type HeroGearSlot = 'helm' | 'gloves' | 'shroud' | 'greaves';
+export type HeroGearSlot = "helm" | "gloves" | "shroud" | "greaves";
 
-export const HERO_GEAR_SLOTS: HeroGearSlot[] = ['helm', 'gloves', 'shroud', 'greaves'];
+export const HERO_GEAR_SLOTS: HeroGearSlot[] = [
+  "helm",
+  "gloves",
+  "shroud",
+  "greaves",
+];
 
 export const HERO_GEAR_LABELS: Record<HeroGearSlot, string> = {
-  helm: 'Helm',
-  gloves: 'Gloves',
-  shroud: 'Shroud',
-  greaves: 'Greaves',
+  helm: "Helm",
+  gloves: "Gloves",
+  shroud: "Shroud",
+  greaves: "Greaves",
 };
 
 export interface HeroGearData {
@@ -99,40 +134,40 @@ export interface StaticBonuses {
 
 // ─── Hero Types ───────────────────────────────────────────────────────────────
 export type HeroName =
-  | 'None'
-  | 'Other'
+  | "None"
+  | "Other"
   // Infantry lead heroes
-  | 'Amadeus'
-  | 'Zoe'
-  | 'Hilde'
-  | 'Eric'
-  | 'Alcar'
-  | 'Margot'
-  | 'Rosa'
-  | 'Howard'
-  | 'Longfei'
-  | 'Thrud'
+  | "Amadeus"
+  | "Zoe"
+  | "Hilde"
+  | "Eric"
+  | "Alcar"
+  | "Margot"
+  | "Rosa"
+  | "Howard"
+  | "Longfei"
+  | "Thrud"
   // Cavalry lead heroes
-  | 'Jabel'
-  | 'Petra'
-  | 'Saul'
-  | 'Gordon'
-  | 'Helga'
-  | 'Edwin'
-  | 'Jaeger'
-  | 'Fahd'
+  | "Jabel"
+  | "Petra"
+  | "Saul"
+  | "Gordon"
+  | "Helga"
+  | "Edwin"
+  | "Jaeger"
+  | "Fahd"
   // Archery lead heroes
-  | 'Marlin'
-  | 'Quinn'
-  | 'Vivian'
+  | "Marlin"
+  | "Quinn"
+  | "Vivian"
   // Joiner / universal heroes
-  | 'Amane'
-  | 'Chenko'
-  | 'Yeonwoo'
-  | 'Diana'
-  | 'Forrest'
-  | 'Seth'
-  | 'Olive';
+  | "Amane"
+  | "Chenko"
+  | "Yeonwoo"
+  | "Diana"
+  | "Forrest"
+  | "Seth"
+  | "Olive";
 
 // ─── Stats ────────────────────────────────────────────────────────────────────
 
@@ -236,8 +271,8 @@ export interface FormationResult {
   ratio: OptimalRatio;
   distribution: TroopDistribution;
   damageScore: number;
-  naiveScore: number;    // equal 33/33/33 for comparison
-  maxScore: number;      // theoretical max (same as damageScore at optimal)
+  naiveScore: number; // equal 33/33/33 for comparison
+  maxScore: number; // theoretical max (same as damageScore at optimal)
 }
 
 // ─── Participant Optimizer ───────────────────────────────────────────────────

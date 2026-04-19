@@ -1,19 +1,19 @@
-import { useState, useRef } from 'react';
-import { useRallyStore } from '../../store/useRallyStore';
-import { SectionCard } from '../ui';
-import { User, Trash2, Download, Upload, Plus } from 'lucide-react';
-import { exportProfile, importProfileFromJson } from '../../lib/storage';
-import clsx from 'clsx';
+import { useState, useRef } from "react";
+import { useRallyStore } from "../../store/useRallyStore";
+import { SectionCard } from "../ui";
+import { User, Trash2, Download, Upload, Plus } from "lucide-react";
+import { exportProfile, importProfileFromJson } from "../../lib/storage";
+import clsx from "clsx";
 
 export function ProfileManager() {
-  const profiles = useRallyStore(s => s.profiles);
-  const activeProfile = useRallyStore(s => s.activeProfile);
-  const newProfile = useRallyStore(s => s.newProfile);
-  const selectProfile = useRallyStore(s => s.selectProfile);
-  const removeProfile = useRallyStore(s => s.removeProfile);
-  const updateProfile = useRallyStore(s => s.updateProfile);
+  const profiles = useRallyStore((s) => s.profiles);
+  const activeProfile = useRallyStore((s) => s.activeProfile);
+  const newProfile = useRallyStore((s) => s.newProfile);
+  const selectProfile = useRallyStore((s) => s.selectProfile);
+  const removeProfile = useRallyStore((s) => s.removeProfile);
+  const updateProfile = useRallyStore((s) => s.updateProfile);
 
-  const [newName, setNewName] = useState('');
+  const [newName, setNewName] = useState("");
   const [showNew, setShowNew] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
@@ -22,7 +22,7 @@ export function ProfileManager() {
   const handleCreate = () => {
     if (newName.trim()) {
       newProfile(newName.trim());
-      setNewName('');
+      setNewName("");
       setShowNew(false);
     }
   };
@@ -31,32 +31,32 @@ export function ProfileManager() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => {
+    reader.onload = (ev) => {
       const json = ev.target?.result as string;
       const profile = importProfileFromJson(json);
       if (profile) {
         updateProfile(profile);
         setImportError(null);
       } else {
-        setImportError('Invalid profile file.');
+        setImportError("Invalid profile file.");
       }
     };
     reader.readAsText(file);
-    e.target.value = '';
+    e.target.value = "";
   };
 
   return (
     <div className="max-w-5xl mx-auto">
       <SectionCard title="Saved Profiles" icon={<User size={15} />}>
         <div className="space-y-2">
-          {profiles.map(p => (
+          {profiles.map((p) => (
             <div
               key={p.id}
               className={clsx(
-                'flex items-center gap-3 rounded-lg px-4 py-3 border transition-colors',
+                "flex items-center gap-3 rounded-lg px-4 py-3 border transition-colors",
                 p.id === activeProfile?.id
-                  ? 'border-orange-500/40 bg-orange-500/5'
-                  : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                  ? "border-orange-500/40 bg-orange-500/5"
+                  : "border-gray-700 bg-gray-800 hover:border-gray-600",
               )}
             >
               <button
@@ -64,13 +64,20 @@ export function ProfileManager() {
                 onClick={() => selectProfile(p.id)}
                 className="flex-1 text-left"
               >
-                <p className={clsx('text-sm font-medium', p.id === activeProfile?.id ? 'text-orange-400' : 'text-gray-200')}>
+                <p
+                  className={clsx(
+                    "text-sm font-medium",
+                    p.id === activeProfile?.id
+                      ? "text-orange-400"
+                      : "text-gray-200",
+                  )}
+                >
                   {p.name}
                 </p>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  INF {p.stats.inf_atk}%/{p.stats.inf_let}% ·
-                  CAV {p.stats.cav_atk}%/{p.stats.cav_let}% ·
-                  ARC {p.stats.arc_atk}%/{p.stats.arc_let}%
+                  INF {p.stats.inf_atk}%/{p.stats.inf_let}% · CAV{" "}
+                  {p.stats.cav_atk}%/{p.stats.cav_let}% · ARC {p.stats.arc_atk}
+                  %/{p.stats.arc_let}%
                 </p>
               </button>
 
@@ -90,7 +97,10 @@ export function ProfileManager() {
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
-                      onClick={() => { removeProfile(p.id); setConfirmDelete(null); }}
+                      onClick={() => {
+                        removeProfile(p.id);
+                        setConfirmDelete(null);
+                      }}
                       className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
                     >
                       Confirm
@@ -125,8 +135,8 @@ export function ProfileManager() {
             <input
               type="text"
               value={newName}
-              onChange={e => setNewName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleCreate()}
+              onChange={(e) => setNewName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleCreate()}
               placeholder="New profile name..."
               className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-orange-500 transition-colors"
             />
@@ -139,7 +149,10 @@ export function ProfileManager() {
             </button>
             <button
               type="button"
-              onClick={() => { setShowNew(false); setNewName(''); }}
+              onClick={() => {
+                setShowNew(false);
+                setNewName("");
+              }}
               className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
             >
               Cancel
@@ -181,7 +194,8 @@ export function ProfileManager() {
         )}
 
         <p className="text-xs text-gray-600 mt-3">
-          Up to 10 profiles. Auto-saved to localStorage — data stays in your browser.
+          Up to 10 profiles. Auto-saved to localStorage — data stays in your
+          browser.
         </p>
       </SectionCard>
     </div>

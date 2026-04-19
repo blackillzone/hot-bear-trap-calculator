@@ -1,12 +1,12 @@
-import { useRallyStore } from '../../store/useRallyStore';
-import { SectionCard } from '../ui';
-import { Table } from 'lucide-react';
-import { formatTroops } from '../../lib/formulas';
-import clsx from 'clsx';
+import { useRallyStore } from "../../store/useRallyStore";
+import { SectionCard } from "../ui";
+import { Table } from "lucide-react";
+import { formatTroops } from "../../lib/formulas";
+import clsx from "clsx";
 
 export function TroopTable() {
-  const result = useRallyStore(s => s.result);
-  const config = useRallyStore(s => s.rallyConfig);
+  const result = useRallyStore((s) => s.result);
+  const config = useRallyStore((s) => s.rallyConfig);
 
   if (!result) return null;
 
@@ -15,9 +15,9 @@ export function TroopTable() {
   // Color code deviation from optimal
   const deviation = (actual: number, optimal: number): string => {
     const diff = Math.abs(actual - optimal);
-    if (diff < 0.05) return 'text-green-400';
-    if (diff < 0.15) return 'text-yellow-400';
-    return 'text-red-400';
+    if (diff < 0.05) return "text-green-400";
+    if (diff < 0.15) return "text-yellow-400";
+    return "text-red-400";
   };
 
   const troopePerP = Math.floor(config.capacity / config.participants);
@@ -27,27 +27,27 @@ export function TroopTable() {
 
   const rows = [
     {
-      type: 'Infantry',
-      color: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-      dot: 'bg-blue-500',
+      type: "Infantry",
+      color: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+      dot: "bg-blue-500",
       perParticipant: distribution.inf,
       total: distribution.totalInf,
       optimalPct: ratio.inf,
       actualPct: infRatio,
     },
     {
-      type: 'Cavalry',
-      color: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-      dot: 'bg-purple-500',
+      type: "Cavalry",
+      color: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+      dot: "bg-purple-500",
       perParticipant: distribution.cav,
       total: distribution.totalCav,
       optimalPct: ratio.cav,
       actualPct: cavRatio,
     },
     {
-      type: 'Archery',
-      color: 'bg-green-500/20 text-green-400 border-green-500/30',
-      dot: 'bg-green-500',
+      type: "Archery",
+      color: "bg-green-500/20 text-green-400 border-green-500/30",
+      dot: "bg-green-500",
       perParticipant: distribution.arc,
       total: distribution.totalArc,
       optimalPct: ratio.arc,
@@ -68,21 +68,35 @@ export function TroopTable() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
-            {rows.map(row => (
+            {rows.map((row) => (
               <tr key={row.type}>
                 <td className="py-2.5">
                   <div className="flex items-center gap-2">
-                    <span className={clsx('w-2 h-2 rounded-full shrink-0', row.dot)} />
-                    <span className="text-gray-200 font-medium">{row.type}</span>
+                    <span
+                      className={clsx("w-2 h-2 rounded-full shrink-0", row.dot)}
+                    />
+                    <span className="text-gray-200 font-medium">
+                      {row.type}
+                    </span>
                   </div>
                 </td>
                 <td className="py-2.5 text-right">
-                  <span className={clsx('font-mono text-xs px-1.5 py-0.5 rounded border', row.color)}>
+                  <span
+                    className={clsx(
+                      "font-mono text-xs px-1.5 py-0.5 rounded border",
+                      row.color,
+                    )}
+                  >
                     {(row.optimalPct * 100).toFixed(1)}%
                   </span>
                 </td>
                 <td className="py-2.5 text-right">
-                  <span className={clsx('font-mono font-semibold', deviation(row.actualPct, row.optimalPct))}>
+                  <span
+                    className={clsx(
+                      "font-mono font-semibold",
+                      deviation(row.actualPct, row.optimalPct),
+                    )}
+                  >
                     {row.perParticipant.toLocaleString()}
                   </span>
                 </td>

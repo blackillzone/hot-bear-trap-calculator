@@ -1,25 +1,25 @@
-import { useRallyStore } from '../../store/useRallyStore';
-import { TROOP_LEVELS } from '../../types';
-import type { TroopLevel, TroopType, TroopInventory } from '../../types';
-import { NumberInput } from '../ui';
+import { useRallyStore } from "../../store/useRallyStore";
+import { TROOP_LEVELS } from "../../types";
+import type { TroopLevel, TroopType, TroopInventory } from "../../types";
+import { NumberInput } from "../ui";
 
 const TROOP_TYPES: { type: TroopType; label: string }[] = [
-  { type: 'inf', label: 'Infantry' },
-  { type: 'cav', label: 'Cavalry' },
-  { type: 'arc', label: 'Archers' },
+  { type: "inf", label: "Infantry" },
+  { type: "cav", label: "Cavalry" },
+  { type: "arc", label: "Archers" },
 ];
 
 const TYPE_COLOR: Record<TroopType, string> = {
-  inf: 'text-red-400',
-  cav: 'text-yellow-400',
-  arc: 'text-blue-400',
+  inf: "text-red-400",
+  cav: "text-yellow-400",
+  arc: "text-blue-400",
 };
 
-const TIER_SEPARATOR_BEFORE = 'TG1'; // Draw a visual separator before TG tiers
+const TIER_SEPARATOR_BEFORE = "TG1"; // Draw a visual separator before TG tiers
 
 export function TroopEditor() {
-  const activeProfile = useRallyStore(s => s.activeProfile);
-  const updateProfile  = useRallyStore(s => s.updateProfile);
+  const activeProfile = useRallyStore((s) => s.activeProfile);
+  const updateProfile = useRallyStore((s) => s.updateProfile);
 
   if (!activeProfile) return null;
 
@@ -42,24 +42,29 @@ export function TroopEditor() {
               Tier
             </th>
             {TROOP_TYPES.map(({ type, label }) => (
-              <th key={type} className={`text-center text-xs font-semibold uppercase tracking-wider pb-2 px-2 ${TYPE_COLOR[type]}`}>
+              <th
+                key={type}
+                className={`text-center text-xs font-semibold uppercase tracking-wider pb-2 px-2 ${TYPE_COLOR[type]}`}
+              >
                 {label}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {TROOP_LEVELS.map(level => (
+          {TROOP_LEVELS.map((level) => (
             <tr
               key={level}
               className={
                 level === TIER_SEPARATOR_BEFORE
-                  ? 'border-t border-orange-500/30'
-                  : ''
+                  ? "border-t border-orange-500/30"
+                  : ""
               }
             >
               <td className="py-1 pr-3">
-                <span className={`text-xs font-bold ${level.startsWith('TG') ? 'text-orange-400' : 'text-gray-400'}`}>
+                <span
+                  className={`text-xs font-bold ${level.startsWith("TG") ? "text-orange-400" : "text-gray-400"}`}
+                >
                   {level}
                 </span>
               </td>
@@ -67,7 +72,7 @@ export function TroopEditor() {
                 <td key={type} className="py-1 px-2">
                   <NumberInput
                     value={troops[type][level]}
-                    onChange={v => updateTroop(type, level, v)}
+                    onChange={(v) => updateTroop(type, level, v)}
                     min={0}
                     step={1000}
                     className="text-center"

@@ -1,38 +1,48 @@
-import { useRallyStore } from '../../store/useRallyStore';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import type { PieLabelRenderProps } from 'recharts';
-import { SectionCard } from '../ui';
-import { PieChart as PieIcon } from 'lucide-react';
+import { useRallyStore } from "../../store/useRallyStore";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import type { PieLabelRenderProps } from "recharts";
+import { SectionCard } from "../ui";
+import { PieChart as PieIcon } from "lucide-react";
 
 const COLORS = {
-  Infantry: '#3b82f6',   // blue
-  Cavalry: '#a855f7',    // purple
-  Archery: '#22c55e',    // green
+  Infantry: "#3b82f6", // blue
+  Cavalry: "#a855f7", // purple
+  Archery: "#22c55e", // green
 };
 
 export function OptimalRatioPie() {
-  const result = useRallyStore(s => s.result);
+  const result = useRallyStore((s) => s.result);
 
   if (!result) return null;
 
   const { ratio } = result;
 
   const data = [
-    { name: 'Infantry', value: parseFloat((ratio.inf * 100).toFixed(1)) },
-    { name: 'Cavalry', value: parseFloat((ratio.cav * 100).toFixed(1)) },
-    { name: 'Archery', value: parseFloat((ratio.arc * 100).toFixed(1)) },
+    { name: "Infantry", value: parseFloat((ratio.inf * 100).toFixed(1)) },
+    { name: "Cavalry", value: parseFloat((ratio.cav * 100).toFixed(1)) },
+    { name: "Archery", value: parseFloat((ratio.arc * 100).toFixed(1)) },
   ];
 
   const CustomLabel = (props: PieLabelRenderProps) => {
     const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props;
-    if (!cx || !cy || !midAngle || !innerRadius || !outerRadius || !percent) return null;
+    if (!cx || !cy || !midAngle || !innerRadius || !outerRadius || !percent)
+      return null;
     const RADIAN = Math.PI / 180;
-    const radius = Number(innerRadius) + (Number(outerRadius) - Number(innerRadius)) * 0.5;
+    const radius =
+      Number(innerRadius) + (Number(outerRadius) - Number(innerRadius)) * 0.5;
     const x = Number(cx) + radius * Math.cos(-Number(midAngle) * RADIAN);
     const y = Number(cy) + radius * Math.sin(-Number(midAngle) * RADIAN);
     if (Number(percent) < 0.05) return null;
     return (
-      <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight="bold">
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={12}
+        fontWeight="bold"
+      >
         {`${(Number(percent) * 100).toFixed(1)}%`}
       </text>
     );
@@ -54,15 +64,22 @@ export function OptimalRatioPie() {
                 outerRadius={90}
                 dataKey="value"
               >
-                {data.map(entry => (
-                  <Cell key={entry.name} fill={COLORS[entry.name as keyof typeof COLORS]} />
+                {data.map((entry) => (
+                  <Cell
+                    key={entry.name}
+                    fill={COLORS[entry.name as keyof typeof COLORS]}
+                  />
                 ))}
               </Pie>
               <Tooltip
-                formatter={(v) => [`${v}%`, '']}
-                contentStyle={{ background: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
-                labelStyle={{ color: '#9ca3af' }}
-                itemStyle={{ color: '#f9fafb' }}
+                formatter={(v) => [`${v}%`, ""]}
+                contentStyle={{
+                  background: "#1f2937",
+                  border: "1px solid #374151",
+                  borderRadius: "8px",
+                }}
+                labelStyle={{ color: "#9ca3af" }}
+                itemStyle={{ color: "#f9fafb" }}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -70,16 +87,23 @@ export function OptimalRatioPie() {
 
         {/* Legend */}
         <div className="flex flex-col gap-3 flex-1">
-          {data.map(entry => (
+          {data.map((entry) => (
             <div key={entry.name} className="flex items-center gap-3">
               <span
                 className="w-3 h-3 rounded-sm shrink-0"
-                style={{ background: COLORS[entry.name as keyof typeof COLORS] }}
+                style={{
+                  background: COLORS[entry.name as keyof typeof COLORS],
+                }}
               />
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-300">{entry.name}</span>
-                  <span className="text-sm font-bold" style={{ color: COLORS[entry.name as keyof typeof COLORS] }}>
+                  <span className="text-sm font-medium text-gray-300">
+                    {entry.name}
+                  </span>
+                  <span
+                    className="text-sm font-bold"
+                    style={{ color: COLORS[entry.name as keyof typeof COLORS] }}
+                  >
                     {entry.value}%
                   </span>
                 </div>

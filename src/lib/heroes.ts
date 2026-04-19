@@ -1,4 +1,4 @@
-import type { HeroName, TroopType, JoinerSlot } from '../types';
+import type { HeroName, TroopType, JoinerSlot } from "../types";
 
 /**
  * Widget exclusive gear expedition skill effect relevant to rally:
@@ -6,18 +6,18 @@ import type { HeroName, TroopType, JoinerSlot } from '../types';
  * 'rally_let' – increases Rally troops' LET%
  * 'none'      – no rally-relevant widget (defender/health/defense type or no gear)
  */
-type HeroWidgetEffect = 'rally_atk' | 'rally_let' | 'none';
+type HeroWidgetEffect = "rally_atk" | "rally_let" | "none";
 
 /**
  * 'atk_all'  – adds X% Attack to ALL troop types (Amane "Tri Phalanx")
  * 'let_all'  – adds X% Lethality to ALL troop types (Chenko, Yeonwoo, Amadeus)
  * 'none'     – no modeled combat effect
  */
-type JoinerBonusType = 'atk_all' | 'let_all' | 'none';
+type JoinerBonusType = "atk_all" | "let_all" | "none";
 
 interface HeroData {
   name: HeroName;
-  type: TroopType | 'universal';
+  type: TroopType | "universal";
   /** ATK% bonus contributed to troops of this hero's type (lead hero, level-5 value) */
   atk_bonus: number;
   /** LET% bonus contributed to troops of this hero's type (lead hero, level-5 value) */
@@ -35,7 +35,7 @@ interface HeroData {
    */
   widget_effect: HeroWidgetEffect;
   /** Hero generation: 1–6 = Mythic generation, 'epic' = Epic tier, 'rare' = Rare tier, null = placeholder */
-  generation: number | 'epic' | 'rare' | null;
+  generation: number | "epic" | "rare" | null;
   /** Hero's key skill name */
   skill: string;
   /** Short description */
@@ -54,255 +54,375 @@ interface HeroData {
  */
 export const HERO_DB: Record<HeroName, HeroData> = {
   None: {
-    name: 'None', type: 'universal',
-    atk_bonus: 0, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none',
+    name: "None",
+    type: "universal",
+    atk_bonus: 0,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none",
     generation: null,
-    skill: '—', description: 'No hero selected',
+    skill: "—",
+    description: "No hero selected",
   },
   Other: {
-    name: 'Other', type: 'universal',
-    atk_bonus: 0, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none',
+    name: "Other",
+    type: "universal",
+    atk_bonus: 0,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none",
     generation: null,
-    skill: '—', description: 'Hero not in database — enter stats manually',
+    skill: "—",
+    description: "Hero not in database — enter stats manually",
   },
 
   // ─── Infantry Lead Heroes ─────────────────────────────────────────────────
   Amadeus: {
-    name: 'Amadeus', type: 'inf',
-    atk_bonus: 165.3, let_bonus: 131.1,
-    skill_bonuses: [5, 10, 15, 20, 25], bonus_type: 'let_all',
-    widget_effect: 'rally_atk', // "Discernment" – Rally Attack +15%
+    name: "Amadeus",
+    type: "inf",
+    atk_bonus: 165.3,
+    let_bonus: 131.1,
+    skill_bonuses: [5, 10, 15, 20, 25],
+    bonus_type: "let_all",
+    widget_effect: "rally_atk", // "Discernment" – Rally Attack +15%
     generation: 1,
-    skill: 'Way of the Blade', description: '+ATK & +LET to infantry (lead) · +LET% all troops (joiner)',
+    skill: "Way of the Blade",
+    description: "+ATK & +LET to infantry (lead) · +LET% all troops (joiner)",
   },
   Zoe: {
-    name: 'Zoe', type: 'inf',
-    atk_bonus: 0, let_bonus: 150,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // "Defender Attack" – not rally-relevant
+    name: "Zoe",
+    type: "inf",
+    atk_bonus: 0,
+    let_bonus: 150,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // "Defender Attack" – not rally-relevant
     generation: 2,
-    skill: 'Unbreakable', description: '+LET to infantry troops',
+    skill: "Unbreakable",
+    description: "+LET to infantry troops",
   },
   Hilde: {
-    name: 'Hilde', type: 'cav',
-    atk_bonus: 120, let_bonus: 120,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // "Fortitude" – Defender Health
+    name: "Hilde",
+    type: "cav",
+    atk_bonus: 120,
+    let_bonus: 120,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // "Fortitude" – Defender Health
     generation: 2,
-    skill: 'Shield Maiden', description: '+ATK & +LET to cavalry troops',
+    skill: "Shield Maiden",
+    description: "+ATK & +LET to cavalry troops",
   },
   Eric: {
-    name: 'Eric', type: 'inf',
-    atk_bonus: 100, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // Defender Defense
+    name: "Eric",
+    type: "inf",
+    atk_bonus: 100,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // Defender Defense
     generation: 3,
-    skill: 'Battle Surge', description: '+ATK to infantry troops',
+    skill: "Battle Surge",
+    description: "+ATK to infantry troops",
   },
   Alcar: {
-    name: 'Alcar', type: 'inf',
-    atk_bonus: 0, let_bonus: 180,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // "Vow of Honor" – Defender Health
+    name: "Alcar",
+    type: "inf",
+    atk_bonus: 0,
+    let_bonus: 180,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // "Vow of Honor" – Defender Health
     generation: 4,
-    skill: 'Troop Bane', description: '+LET to infantry troops',
+    skill: "Troop Bane",
+    description: "+LET to infantry troops",
   },
   Margot: {
-    name: 'Margot', type: 'cav',
-    atk_bonus: 0, let_bonus: 160,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // "Pugilist" – Defender Lethality (not rally)
+    name: "Margot",
+    type: "cav",
+    atk_bonus: 0,
+    let_bonus: 160,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // "Pugilist" – Defender Lethality (not rally)
     generation: 4,
-    skill: 'Lethal Edge', description: '+LET to cavalry troops',
+    skill: "Lethal Edge",
+    description: "+LET to cavalry troops",
   },
   Rosa: {
-    name: 'Rosa', type: 'arc',
-    atk_bonus: 140, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'rally_let', // "Perihelion" – Rally Lethality +15%
+    name: "Rosa",
+    type: "arc",
+    atk_bonus: 140,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "rally_let", // "Perihelion" – Rally Lethality +15%
     generation: 4,
-    skill: "War's Embrace", description: '+ATK to archery troops',
+    skill: "War's Embrace",
+    description: "+ATK to archery troops",
   },
   Howard: {
-    name: 'Howard', type: 'inf',
-    atk_bonus: 80, let_bonus: 80,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // Epic hero – no exclusive gear
-    generation: 'epic',
-    skill: 'Iron Resolve', description: '+ATK & +LET to infantry troops',
+    name: "Howard",
+    type: "inf",
+    atk_bonus: 80,
+    let_bonus: 80,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // Epic hero – no exclusive gear
+    generation: "epic",
+    skill: "Iron Resolve",
+    description: "+ATK & +LET to infantry troops",
   },
   Longfei: {
-    name: 'Longfei', type: 'inf',
-    atk_bonus: 100, let_bonus: 100,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // "Strategic Strike" – Defender Attack (not rally)
+    name: "Longfei",
+    type: "inf",
+    atk_bonus: 100,
+    let_bonus: 100,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // "Strategic Strike" – Defender Attack (not rally)
     generation: 5,
-    skill: 'Dragon Strike', description: '+ATK & +LET to infantry troops',
+    skill: "Dragon Strike",
+    description: "+ATK & +LET to infantry troops",
   },
   Thrud: {
-    name: 'Thrud', type: 'cav',
-    atk_bonus: 90, let_bonus: 110,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'rally_let', // "Wolf-Kissed" – Rally Lethality +15%
+    name: "Thrud",
+    type: "cav",
+    atk_bonus: 90,
+    let_bonus: 110,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "rally_let", // "Wolf-Kissed" – Rally Lethality +15%
     generation: 5,
-    skill: "Thunder's Call", description: '+ATK & +LET to cavalry troops',
+    skill: "Thunder's Call",
+    description: "+ATK & +LET to cavalry troops",
   },
 
   // ─── Cavalry Lead Heroes ──────────────────────────────────────────────────
   Jabel: {
-    name: 'Jabel', type: 'cav',
-    atk_bonus: 200.16, let_bonus: 125,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // "Divine Strength" – Defender Lethality (not rally)
+    name: "Jabel",
+    type: "cav",
+    atk_bonus: 200.16,
+    let_bonus: 125,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // "Divine Strength" – Defender Lethality (not rally)
     generation: 1,
-    skill: "Hero's Domain", description: '+ATK & +LET to cavalry troops',
+    skill: "Hero's Domain",
+    description: "+ATK & +LET to cavalry troops",
   },
   Petra: {
-    name: 'Petra', type: 'cav',
-    atk_bonus: 0, let_bonus: 200,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'rally_atk', // "Cosmic Eye" – Rally Attack +15%
+    name: "Petra",
+    type: "cav",
+    atk_bonus: 0,
+    let_bonus: 200,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "rally_atk", // "Cosmic Eye" – Rally Attack +15%
     generation: 3,
-    skill: 'Lancer Mastery', description: '+LET to cavalry troops',
+    skill: "Lancer Mastery",
+    description: "+LET to cavalry troops",
   },
   Saul: {
-    name: 'Saul', type: 'arc',
-    atk_bonus: 150, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // "Defend to Attack" – Defender Attack (not rally)
+    name: "Saul",
+    type: "arc",
+    atk_bonus: 150,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // "Defend to Attack" – Defender Attack (not rally)
     generation: 1,
-    skill: 'Charge', description: '+ATK to archery troops',
+    skill: "Charge",
+    description: "+ATK to archery troops",
   },
   Gordon: {
-    name: 'Gordon', type: 'cav',
-    atk_bonus: 120, let_bonus: 120,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // Epic hero – no exclusive gear
-    generation: 'epic',
-    skill: 'War Charge', description: '+ATK & +LET to cavalry troops',
+    name: "Gordon",
+    type: "cav",
+    atk_bonus: 120,
+    let_bonus: 120,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // Epic hero – no exclusive gear
+    generation: "epic",
+    skill: "War Charge",
+    description: "+ATK & +LET to cavalry troops",
   },
   Helga: {
-    name: 'Helga', type: 'inf',
-    atk_bonus: 0, let_bonus: 160,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'rally_let', // "Zeal" – Rally Lethality +15%
+    name: "Helga",
+    type: "inf",
+    atk_bonus: 0,
+    let_bonus: 160,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "rally_let", // "Zeal" – Rally Lethality +15%
     generation: 1,
-    skill: 'Zeal', description: '+LET to infantry troops',
+    skill: "Zeal",
+    description: "+LET to infantry troops",
   },
   Edwin: {
-    name: 'Edwin', type: 'cav',
-    atk_bonus: 130, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // Rare hero – no exclusive gear
-    generation: 'rare',
-    skill: "Knight's Will", description: '+ATK to cavalry troops',
+    name: "Edwin",
+    type: "cav",
+    atk_bonus: 130,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // Rare hero – no exclusive gear
+    generation: "rare",
+    skill: "Knight's Will",
+    description: "+ATK to cavalry troops",
   },
   Jaeger: {
-    name: 'Jaeger', type: 'arc',
-    atk_bonus: 100, let_bonus: 100,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // "Hymn to Survival" – Defender Health
+    name: "Jaeger",
+    type: "arc",
+    atk_bonus: 100,
+    let_bonus: 100,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // "Hymn to Survival" – Defender Health
     generation: 3,
-    skill: 'Hunter Charge', description: '+ATK & +LET to archery troops',
+    skill: "Hunter Charge",
+    description: "+ATK & +LET to archery troops",
   },
   Fahd: {
-    name: 'Fahd', type: 'cav',
-    atk_bonus: 0, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none',
-    generation: 'epic',
-    skill: 'Desert Eclipse', description: 'No modeled joiner effect',
+    name: "Fahd",
+    type: "cav",
+    atk_bonus: 0,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none",
+    generation: "epic",
+    skill: "Desert Eclipse",
+    description: "No modeled joiner effect",
   },
 
   // ─── Archery Lead Heroes ──────────────────────────────────────────────────
   Marlin: {
-    name: 'Marlin', type: 'arc',
-    atk_bonus: 199.02, let_bonus: 159,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'rally_let', // "Admiral of the Line" – Rally Lethality +15%
+    name: "Marlin",
+    type: "arc",
+    atk_bonus: 199.02,
+    let_bonus: 159,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "rally_let", // "Admiral of the Line" – Rally Lethality +15%
     generation: 2,
-    skill: 'Dynamo', description: '+ATK & +LET to archery troops',
+    skill: "Dynamo",
+    description: "+ATK & +LET to archery troops",
   },
   Quinn: {
-    name: 'Quinn', type: 'arc',
-    atk_bonus: 150, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // Epic hero – no exclusive gear
-    generation: 'epic',
-    skill: 'Marksman', description: '+ATK to archery troops',
+    name: "Quinn",
+    type: "arc",
+    atk_bonus: 150,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // Epic hero – no exclusive gear
+    generation: "epic",
+    skill: "Marksman",
+    description: "+ATK to archery troops",
   },
   Vivian: {
-    name: 'Vivian', type: 'arc',
-    atk_bonus: 100, let_bonus: 150,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none', // Defender Defense widget (not rally)
+    name: "Vivian",
+    type: "arc",
+    atk_bonus: 100,
+    let_bonus: 150,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none", // Defender Defense widget (not rally)
     generation: 5,
-    skill: 'Crouching Tiger', description: '+ATK & +LET to archery troops',
+    skill: "Crouching Tiger",
+    description: "+ATK & +LET to archery troops",
   },
 
   // ─── Joiner / Universal Heroes ────────────────────────────────────────────
   // Amane "Tri Phalanx": +ATK% to ALL troop types — game data
   Amane: {
-    name: 'Amane', type: 'arc',
-    atk_bonus: 0, let_bonus: 0,
-    skill_bonuses: [5, 10, 15, 20, 25], bonus_type: 'atk_all',
-    widget_effect: 'none',
-    generation: 'epic',
-    skill: 'Tri Phalanx', description: '+ATK% to ALL troop types (lv5: +25%)',
+    name: "Amane",
+    type: "arc",
+    atk_bonus: 0,
+    let_bonus: 0,
+    skill_bonuses: [5, 10, 15, 20, 25],
+    bonus_type: "atk_all",
+    widget_effect: "none",
+    generation: "epic",
+    skill: "Tri Phalanx",
+    description: "+ATK% to ALL troop types (lv5: +25%)",
   },
   // Chenko "Stand of Arms": +LET% to ALL troop types — game data
   Chenko: {
-    name: 'Chenko', type: 'cav',
-    atk_bonus: 0, let_bonus: 0,
-    skill_bonuses: [5, 10, 15, 20, 25], bonus_type: 'let_all',
-    widget_effect: 'none',
-    generation: 'epic',
-    skill: 'Stand of Arms', description: '+LET% to ALL troop types (lv5: +25%)',
+    name: "Chenko",
+    type: "cav",
+    atk_bonus: 0,
+    let_bonus: 0,
+    skill_bonuses: [5, 10, 15, 20, 25],
+    bonus_type: "let_all",
+    widget_effect: "none",
+    generation: "epic",
+    skill: "Stand of Arms",
+    description: "+LET% to ALL troop types (lv5: +25%)",
   },
   // Yeonwoo "On Guard": +LET% to ALL troop types — game data
   Yeonwoo: {
-    name: 'Yeonwoo', type: 'arc',
-    atk_bonus: 0, let_bonus: 0,
-    skill_bonuses: [5, 10, 15, 20, 25], bonus_type: 'let_all',
-    widget_effect: 'none',
-    generation: 'epic',
-    skill: 'On Guard', description: '+LET% to ALL troop types (lv5: +25%)',
+    name: "Yeonwoo",
+    type: "arc",
+    atk_bonus: 0,
+    let_bonus: 0,
+    skill_bonuses: [5, 10, 15, 20, 25],
+    bonus_type: "let_all",
+    widget_effect: "none",
+    generation: "epic",
+    skill: "On Guard",
+    description: "+LET% to ALL troop types (lv5: +25%)",
   },
   Diana: {
-    name: 'Diana', type: 'arc',
-    atk_bonus: 0, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none',
-    generation: 'epic',
-    skill: 'Lunar Grace', description: 'No modeled joiner effect',
+    name: "Diana",
+    type: "arc",
+    atk_bonus: 0,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none",
+    generation: "epic",
+    skill: "Lunar Grace",
+    description: "No modeled joiner effect",
   },
   Forrest: {
-    name: 'Forrest', type: 'inf',
-    atk_bonus: 0, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none',
-    generation: 'rare',
-    skill: '—', description: 'Joiner — effect not modeled',
+    name: "Forrest",
+    type: "inf",
+    atk_bonus: 0,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none",
+    generation: "rare",
+    skill: "—",
+    description: "Joiner — effect not modeled",
   },
   Seth: {
-    name: 'Seth', type: 'inf',
-    atk_bonus: 0, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none',
-    generation: 'rare',
-    skill: '—', description: 'Joiner — effect not modeled',
+    name: "Seth",
+    type: "inf",
+    atk_bonus: 0,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none",
+    generation: "rare",
+    skill: "—",
+    description: "Joiner — effect not modeled",
   },
   Olive: {
-    name: 'Olive', type: 'arc',
-    atk_bonus: 0, let_bonus: 0,
-    skill_bonuses: [0, 0, 0, 0, 0], bonus_type: 'none',
-    widget_effect: 'none',
-    generation: 'rare',
-    skill: '—', description: 'Joiner — effect not modeled',
+    name: "Olive",
+    type: "arc",
+    atk_bonus: 0,
+    let_bonus: 0,
+    skill_bonuses: [0, 0, 0, 0, 0],
+    bonus_type: "none",
+    widget_effect: "none",
+    generation: "rare",
+    skill: "—",
+    description: "Joiner — effect not modeled",
   },
 };
 
@@ -310,39 +430,52 @@ export const HERO_DB: Record<HeroName, HeroData> = {
 
 export const LEAD_INF_HEROES: HeroName[] = [
   // G1 → G5, then Epic, then None/Other
-  'Amadeus', 'Helga',             // G1
-  'Zoe',                          // G2
-  'Eric',                         // G3
-  'Alcar',                        // G4
-  'Longfei',                      // G5
-  'Howard',                       // Epic
-  'None', 'Other',
+  "Amadeus",
+  "Helga", // G1
+  "Zoe", // G2
+  "Eric", // G3
+  "Alcar", // G4
+  "Longfei", // G5
+  "Howard", // Epic
+  "None",
+  "Other",
 ];
 
 export const LEAD_CAV_HEROES: HeroName[] = [
   // G1 → G5, then Epic, then None/Other
-  'Jabel',                        // G1
-  'Hilde',                        // G2
-  'Petra',                        // G3
-  'Margot',                       // G4
-  'Thrud',                        // G5
-  'Gordon', 'Chenko', 'Fahd',     // Epic
-  'None', 'Other',
+  "Jabel", // G1
+  "Hilde", // G2
+  "Petra", // G3
+  "Margot", // G4
+  "Thrud", // G5
+  "Gordon",
+  "Chenko",
+  "Fahd", // Epic
+  "None",
+  "Other",
 ];
 
 export const LEAD_ARC_HEROES: HeroName[] = [
   // G1 → G5, then Epic, then None/Other
-  'Saul',                         // G1
-  'Marlin',                       // G2
-  'Jaeger',                       // G3
-  'Rosa',                         // G4
-  'Vivian',                       // G5
-  'Quinn', 'Amane', 'Yeonwoo', 'Diana', // Epic
-  'None', 'Other',
+  "Saul", // G1
+  "Marlin", // G2
+  "Jaeger", // G3
+  "Rosa", // G4
+  "Vivian", // G5
+  "Quinn",
+  "Amane",
+  "Yeonwoo",
+  "Diana", // Epic
+  "None",
+  "Other",
 ];
 
 export const JOINER_HEROES: HeroName[] = [
-  'None', 'Amane', 'Chenko', 'Yeonwoo', 'Amadeus',
+  "None",
+  "Amane",
+  "Chenko",
+  "Yeonwoo",
+  "Amadeus",
 ];
 
 /**
@@ -352,7 +485,7 @@ export const JOINER_HEROES: HeroName[] = [
 export function getJoinerAtkAllBonus(joiners: JoinerSlot[]): number {
   return joiners.reduce((sum, slot) => {
     const hero = HERO_DB[slot.hero];
-    if (!hero || hero.bonus_type !== 'atk_all') return sum;
+    if (!hero || hero.bonus_type !== "atk_all") return sum;
     return sum + hero.skill_bonuses[slot.skillLevel - 1];
   }, 0);
 }
@@ -364,7 +497,7 @@ export function getJoinerAtkAllBonus(joiners: JoinerSlot[]): number {
 export function getJoinerLetAllBonus(joiners: JoinerSlot[]): number {
   return joiners.reduce((sum, slot) => {
     const hero = HERO_DB[slot.hero];
-    if (!hero || hero.bonus_type !== 'let_all') return sum;
+    if (!hero || hero.bonus_type !== "let_all") return sum;
     return sum + hero.skill_bonuses[slot.skillLevel - 1];
   }, 0);
 }
