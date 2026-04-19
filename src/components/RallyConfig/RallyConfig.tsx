@@ -92,7 +92,7 @@ export function RallyConfig() {
           {([0, 1, 2, 3] as const).map((slot) => {
             const joiner = config.joiners[slot];
             const heroData = HERO_DB[joiner.hero];
-            const bonus = heroData.skill_bonuses[joiner.skillLevel - 1];
+            const bonus = heroData.skill_bonuses[joiner.skillLevel - 1] ?? 0;
             const hasBonus = bonus > 0;
             const bonusLabel =
               heroData.bonus_type === "atk_all"

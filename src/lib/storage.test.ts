@@ -9,6 +9,9 @@ import {
   saveActiveProfileId,
   exportProfile,
   importProfileFromJson,
+  validateProfile,
+  migrateProfile,
+  CURRENT_PROFILE_VERSION,
   defaultStats,
   defaultWidgets,
 } from "./storage";
@@ -97,8 +100,8 @@ describe("loadProfiles / saveProfiles", () => {
 
     const loaded = loadProfiles();
     expect(loaded).toHaveLength(2);
-    expect(loaded[0].name).toBe("Profile 1");
-    expect(loaded[1].name).toBe("Profile 2");
+    expect(loaded[0]!.name).toBe("Profile 1");
+    expect(loaded[1]!.name).toBe("Profile 2");
   });
 
   it("should migrate missing fields in loaded profiles", () => {
@@ -118,12 +121,12 @@ describe("loadProfiles / saveProfiles", () => {
     localStorage.setItem("ks_profiles", JSON.stringify([oldProfile]));
 
     const loaded = loadProfiles();
-    expect(loaded[0].widget_levels).toBeDefined();
-    expect(loaded[0].ownedHeroes).toBeDefined();
-    expect(loaded[0].govGear).toBeDefined();
-    expect(loaded[0].govCharmLevel).toBeGreaterThanOrEqual(0);
-    expect(loaded[0].staticBonuses).toBeDefined();
-    expect(loaded[0].troops).toBeDefined();
+    expect(loaded[0]!.widget_levels).toBeDefined();
+    expect(loaded[0]!.ownedHeroes).toBeDefined();
+    expect(loaded[0]!.govGear).toBeDefined();
+    expect(loaded[0]!.govCharmLevel).toBeGreaterThanOrEqual(0);
+    expect(loaded[0]!.staticBonuses).toBeDefined();
+    expect(loaded[0]!.troops).toBeDefined();
   });
 
   it("should handle invalid JSON gracefully", () => {
@@ -141,7 +144,7 @@ describe("upsertProfile", () => {
     const result = upsertProfile([], profile);
 
     expect(result).toHaveLength(1);
-    expect(result[0].id).toBe(profile.id);
+    expect(result[0]!.id).toBe(profile.id);
   });
 
   it("should update an existing profile by id", () => {
@@ -152,7 +155,7 @@ describe("upsertProfile", () => {
     profiles = upsertProfile(profiles, updated);
 
     expect(profiles).toHaveLength(1);
-    expect(profiles[0].name).toBe("Updated Name");
+    expect(profiles[0]!.name).toBe("Updated Name");
   });
 
   it("should remove oldest profile if exceeding MAX_PROFILES (10)", () => {
@@ -164,8 +167,8 @@ describe("upsertProfile", () => {
     }
 
     expect(profiles).toHaveLength(10);
-    expect(profiles[0].name).toBe("Profile 3"); // First 2 removed (oldest first)
-    expect(profiles[9].name).toBe("Profile 12");
+    expect(profiles[0]!.name).toBe("Profile 3"); // First 2 removed (oldest first)
+    expect(profiles[9]!.name).toBe("Profile 12");
   });
 
   it("should preserve order when updating existing profile", () => {
@@ -180,7 +183,7 @@ describe("upsertProfile", () => {
     const updated = { ...p2, name: "Profile 2 Updated" };
     profiles = upsertProfile(profiles, updated);
 
-    expect(profiles[1].name).toBe("Profile 2 Updated");
+    expect(profiles[1]!.name).toBe("Profile 2 Updated");
     expect(profiles).toHaveLength(3);
   });
 });
@@ -357,5 +360,108 @@ describe("default* functions", () => {
     expect(widgets.cav_let).toBe(0);
     expect(widgets.arc_atk).toBe(0);
     expect(widgets.arc_let).toBe(0);
+  });
+});
+
+// ─── validateProfile & migrateProfile tests ───────────────────────────────────
+
+describe("validateProfile", () => {
+  it("should return null for null or non-object inputs", () => {
+    expect(validateProfile(null)).toBeNull();
+    expect(validateProfile(undefined)).toBeNull();
+    expect(validateProfile("string")).toBeNull();
+    expect(validateProfile(42)).toBeNull();
+  });
+
+  it("should return null when stats or heroes are missing", () => {
+    expect(validateProfile({ name: "Test" })).toBeNull();
+    expect(validateProfile({ stats: defaultStats() })).toBeNull();
+    expect(
+      validateProfile({ heroes: { inf: "None", cav: "None", arc: "None" } }),
+    ).toBeNull();
+  });
+
+  it("should return a valid PlayerProfile for a complete object", () => {
+    const raw = {
+      stats: defaultStats(),
+      heroes: { inf: "None", cav: "None", arc: "None" },
+      name: "Test Profile",
+    };
+    const result = validateProfile(raw);
+    expect(result).not.toBeNull();
+    expect(result!._version).toBe(CURRENT_PROFILE_VERSION);
+    expect(result!.name).toBe("Test Profile");
+  });
+
+  it("should fill missing fields with defaults (migration v1 → v2)", () => {
+    const v1Profile = {
+      id: "old-id",
+      name: "Old Profile",
+      stats: defaultStats(),
+      heroes: { inf: "None", cav: "None", arc: "None" },
+      // Pas de widget_levels, govGear, staticBonuses, troops
+    };
+    const result = validateProfile(v1Profile);
+    expect(result).not.toBeNull();
+    expect(result!.widget_levels).toBeDefined();
+    expect(result!.govGear).toBeDefined();
+    expect(result!.staticBonuses).toBeDefined();
+    expect(result!.troops).toBeDefined();
+    expect(result!._version).toBe(CURRENT_PROFILE_VERSION);
+  });
+});
+
+describe("migrateProfile", () => {
+  it("should assign current version to migrated profile", () => {
+    const raw = {
+      stats: defaultStats(),
+      heroes: { inf: "None", cav: "None", arc: "None" },
+    };
+    const result = migrateProfile(raw);
+    expect(result._version).toBe(CURRENT_PROFILE_VERSION);
+  });
+
+  it("should generate an id if missing", () => {
+    const raw = {
+      stats: defaultStats(),
+      heroes: { inf: "None", cav: "None", arc: "None" },
+    };
+    const result = migrateProfile(raw);
+    expect(typeof result.id).toBe("string");
+    expect(result.id.length).toBeGreaterThan(0);
+  });
+
+  it("should preserve existing id", () => {
+    const raw = {
+      id: "my-existing-id",
+      stats: defaultStats(),
+      heroes: { inf: "None", cav: "None", arc: "None" },
+    };
+    const result = migrateProfile(raw);
+    expect(result.id).toBe("my-existing-id");
+  });
+});
+
+describe("importProfileFromJson — corrupted input", () => {
+  it("should return null for invalid JSON", () => {
+    expect(importProfileFromJson("not json")).toBeNull();
+    expect(importProfileFromJson("{broken")).toBeNull();
+  });
+
+  it("should return null for JSON without required fields", () => {
+    expect(importProfileFromJson(JSON.stringify({ name: "Only name" }))).toBeNull();
+  });
+
+  it("should not crash on a malformed but parseable object", () => {
+    const malformed = JSON.stringify({ foo: "bar", baz: 42 });
+    expect(importProfileFromJson(malformed)).toBeNull();
+  });
+
+  it("should assign a new id different from the original", () => {
+    const original = createProfile("Original");
+    const json = JSON.stringify(original);
+    const imported = importProfileFromJson(json);
+    expect(imported).not.toBeNull();
+    expect(imported!.id).not.toBe(original.id);
   });
 });

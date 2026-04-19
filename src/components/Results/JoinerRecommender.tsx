@@ -24,7 +24,7 @@ function combinationsWithRepetition<T>(pool: T[], k: number): T[][] {
   const result: T[][] = [];
   for (let i = 0; i < pool.length; i++) {
     const sub = combinationsWithRepetition(pool.slice(i), k - 1);
-    for (const s of sub) result.push([pool[i], ...s]);
+    for (const s of sub) result.push([pool[i]!, ...s]);
   }
   return result;
 }
@@ -60,7 +60,7 @@ export function JoinerRecommender() {
         totalLet = 0;
       for (const j of joiners) {
         const h = HERO_DB[j.hero];
-        const b = h.skill_bonuses[j.skillLevel - 1];
+        const b = h.skill_bonuses[j.skillLevel - 1] ?? 0;
         if (h.bonus_type === "atk_all") totalAtk += b;
         if (h.bonus_type === "let_all") totalLet += b;
       }
@@ -104,7 +104,7 @@ export function JoinerRecommender() {
 
   function applyCombo(joiners: JoinerSlot[]) {
     ([0, 1, 2, 3] as const).forEach((i) => {
-      setJoiner(i, joiners[i]);
+      setJoiner(i, joiners[i]!);
     });
   }
 

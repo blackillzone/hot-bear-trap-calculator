@@ -169,3 +169,38 @@ export function SectionCard({
     </div>
   );
 }
+
+interface MiniInputProps {
+  value: number;
+  onChange: (v: number) => void;
+  max: number;
+}
+
+export function MiniInput({ value, onChange, max }: MiniInputProps) {
+  const [display, setDisplay] = useState(String(value));
+  function commit(raw: string) {
+    const v = parseInt(raw, 10);
+    if (!Number.isNaN(v)) {
+      const clamped = Math.max(0, Math.min(max, v));
+      onChange(clamped);
+      setDisplay(String(clamped));
+    } else {
+      setDisplay(String(value));
+    }
+  }
+  return (
+    <input
+      type="number"
+      value={display}
+      min={0}
+      max={max}
+      step={1}
+      onChange={(e) => setDisplay(e.target.value)}
+      onBlur={(e) => commit(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") commit((e.target as HTMLInputElement).value);
+      }}
+      className="w-full bg-gray-900 border border-gray-700 rounded px-1 py-[3px] text-xs text-white text-center outline-none focus:border-orange-500 transition-colors [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+    />
+  );
+}

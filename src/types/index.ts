@@ -200,6 +200,8 @@ export interface WidgetLevels {
 
 // ─── Profile ──────────────────────────────────────────────────────────────────
 export interface PlayerProfile {
+  /** Numéro de version du format. Utilisé pour les migrations. */
+  _version: number;
   id: string;
   name: string;
   createdAt: string;

@@ -16,6 +16,9 @@ const PROFILES_KEY = "ks_profiles";
 const ACTIVE_KEY = "ks_active_profile";
 const MAX_PROFILES = 10;
 
+/** Version courante du format de profil. Incrémenter à chaque changement de schéma. */
+export const CURRENT_PROFILE_VERSION = 2;
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function generateId(): string {
@@ -78,20 +81,73 @@ function defaultTroops(): TroopInventory {
 
 // ─── Profile CRUD ─────────────────────────────────────────────────────────────
 
+// ─── Migration & Validation ──────────────────────────────────────────────────
+
+/**
+ * Migre un profil brut (version inconnue) vers la version courante.
+ * Chaque migration est appliquée séquentiellement.
+ */
+export function migrateProfile(raw: Record<string, unknown>): PlayerProfile {
+  // v1 → v2 : ajout de widget_levels, ownedHeroes, govGear, govCharmLevel, staticBonuses, troops
+  const v2: PlayerProfile = {
+    _version: CURRENT_PROFILE_VERSION,
+    id: typeof raw.id === "string" ? raw.id : generateId(),
+    name: typeof raw.name === "string" ? raw.name : "My Profile",
+    createdAt:
+      typeof raw.createdAt === "string"
+        ? raw.createdAt
+        : new Date().toISOString(),
+    stats: (raw.stats as PlayerProfile["stats"]) ?? defaultStats(),
+    widgets: (raw.widgets as PlayerProfile["widgets"]) ?? defaultWidgets(),
+    widget_levels:
+      (raw.widget_levels as PlayerProfile["widget_levels"]) ??
+      defaultWidgetLevels(),
+    heroes: (raw.heroes as PlayerProfile["heroes"]) ?? {
+      inf: "None",
+      cav: "None",
+      arc: "None",
+    },
+    troop_tier:
+      (raw.troop_tier as PlayerProfile["troop_tier"]) ?? "T10",
+    tg_level: (raw.tg_level as PlayerProfile["tg_level"]) ?? 0,
+    rally_capacity:
+      typeof raw.rally_capacity === "number" ? raw.rally_capacity : 2_000_000,
+    ownedHeroes:
+      (raw.ownedHeroes as PlayerProfile["ownedHeroes"]) ?? {},
+    govGear: (raw.govGear as PlayerProfile["govGear"]) ?? defaultGovGear(),
+    govCharmLevel:
+      typeof raw.govCharmLevel === "number" ? raw.govCharmLevel : 0,
+    staticBonuses:
+      (raw.staticBonuses as PlayerProfile["staticBonuses"]) ??
+      defaultStaticBonuses(),
+    troops: (raw.troops as PlayerProfile["troops"]) ?? defaultTroops(),
+  };
+  return v2;
+}
+
+/**
+ * Valide et migre un objet inconnu en PlayerProfile.
+ * Retourne null si l'objet ne ressemble pas à un profil valide.
+ */
+export function validateProfile(data: unknown): PlayerProfile | null {
+  if (!data || typeof data !== "object") return null;
+  const raw = data as Record<string, unknown>;
+  // Champs minimaux obligatoires
+  if (!raw.stats || !raw.heroes) return null;
+  try {
+    return migrateProfile(raw);
+  } catch {
+    return null;
+  }
+}
+
 export function loadProfiles(): PlayerProfile[] {
   try {
     const raw = localStorage.getItem(PROFILES_KEY);
-    const profiles = raw ? (JSON.parse(raw) as PlayerProfile[]) : [];
-    // Migrate: ensure every profile has all fields from newer versions
-    return profiles.map((p) => ({
-      ...p,
-      widget_levels: p.widget_levels ?? defaultWidgetLevels(),
-      ownedHeroes: p.ownedHeroes ?? {},
-      govGear: p.govGear ?? defaultGovGear(),
-      govCharmLevel: p.govCharmLevel ?? 0,
-      staticBonuses: p.staticBonuses ?? defaultStaticBonuses(),
-      troops: p.troops ?? defaultTroops(),
-    }));
+    const profiles = raw ? (JSON.parse(raw) as unknown[]) : [];
+    return profiles
+      .map((p) => validateProfile(p))
+      .filter((p): p is PlayerProfile => p !== null);
   } catch {
     return [];
   }
@@ -103,6 +159,7 @@ export function saveProfiles(profiles: PlayerProfile[]): void {
 
 export function createProfile(name: string): PlayerProfile {
   return {
+    _version: CURRENT_PROFILE_VERSION,
     id: generateId(),
     name: name || "My Profile",
     createdAt: new Date().toISOString(),
@@ -170,12 +227,16 @@ export function exportProfile(profile: PlayerProfile): void {
 
 export function importProfileFromJson(json: string): PlayerProfile | null {
   try {
-    const obj = JSON.parse(json) as Partial<PlayerProfile>;
-    if (!obj.stats || !obj.heroes) return null;
+    const obj = JSON.parse(json) as unknown;
+    if (!obj || typeof obj !== "object") return null;
+    const raw = obj as Record<string, unknown>;
+    const profile = validateProfile(obj);
+    if (!profile) return null;
     return {
-      ...createProfile(obj.name ?? "Imported Profile"),
-      ...obj,
-      id: generateId(), // always give a new ID on import
+      ...profile,
+      // Utiliser "Imported Profile" si aucun nom n'était fourni dans le JSON source
+      name: typeof raw.name === "string" && raw.name ? raw.name : "Imported Profile",
+      id: generateId(), // toujours un nouvel ID à l'import
       createdAt: new Date().toISOString(),
     };
   } catch {

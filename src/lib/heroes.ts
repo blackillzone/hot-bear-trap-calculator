@@ -486,7 +486,7 @@ export function getJoinerAtkAllBonus(joiners: JoinerSlot[]): number {
   return joiners.reduce((sum, slot) => {
     const hero = HERO_DB[slot.hero];
     if (!hero || hero.bonus_type !== "atk_all") return sum;
-    return sum + hero.skill_bonuses[slot.skillLevel - 1];
+    return sum + (hero.skill_bonuses[slot.skillLevel - 1] ?? 0);
   }, 0);
 }
 
@@ -498,6 +498,6 @@ export function getJoinerLetAllBonus(joiners: JoinerSlot[]): number {
   return joiners.reduce((sum, slot) => {
     const hero = HERO_DB[slot.hero];
     if (!hero || hero.bonus_type !== "let_all") return sum;
-    return sum + hero.skill_bonuses[slot.skillLevel - 1];
+    return sum + (hero.skill_bonuses[slot.skillLevel - 1] ?? 0);
   }, 0);
 }

@@ -11,7 +11,7 @@ export function ProfileManager() {
   const newProfile = useRallyStore((s) => s.newProfile);
   const selectProfile = useRallyStore((s) => s.selectProfile);
   const removeProfile = useRallyStore((s) => s.removeProfile);
-  const updateProfile = useRallyStore((s) => s.updateProfile);
+  const importProfile = useRallyStore((s) => s.importProfile);
 
   const [newName, setNewName] = useState("");
   const [showNew, setShowNew] = useState(false);
@@ -35,7 +35,7 @@ export function ProfileManager() {
       const json = ev.target?.result as string;
       const profile = importProfileFromJson(json);
       if (profile) {
-        updateProfile(profile);
+        importProfile(profile);
         setImportError(null);
       } else {
         setImportError("Invalid profile file.");

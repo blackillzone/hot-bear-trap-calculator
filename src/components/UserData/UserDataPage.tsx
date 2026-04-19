@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useRallyStore } from "../../store/useRallyStore";
 import { GovDataEditor } from "../Profiles/GovDataEditor";
-import { HeroDetailPanel } from "../Profiles/HeroRoster";
+import { HeroDetailPanel } from "../Profiles/HeroDetailPanel";
+import { useAnimatedHeroPanel } from "../../hooks/useAnimatedHeroPanel";
 import type { HeroName, OwnedHeroData } from "../../types";
 import { defaultOwnedHeroData } from "../../lib/storage";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -12,47 +13,14 @@ export function UserDataPage() {
   const updateProfile = useRallyStore((s) => s.updateProfile);
   const userDataTab = useRallyStore((s) => s.userDataTab);
 
-  const [selectedHero, setSelectedHero] = useState<HeroName | null>(null);
-  // renderedHero stays mounted during the exit animation
-  const [renderedHero, setRenderedHero] = useState<HeroName | null>(null);
-  const [panelState, setPanelState] = useState<"enter" | "exit" | "idle">(
-    "idle",
-  );
-  const [panelDx, setPanelDx] = useState<string>("80px");
   const [navHeroes, setNavHeroes] = useState<HeroName[]>([]);
-  const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (exitTimer.current) clearTimeout(exitTimer.current);
-
-    if (selectedHero) {
-      // If we already have a panel open, first play exit then swap
-      if (renderedHero && renderedHero !== selectedHero) {
-        setPanelState("exit");
-        exitTimer.current = setTimeout(() => {
-          setRenderedHero(selectedHero);
-          setPanelState("enter");
-        }, 180);
-      } else {
-        setRenderedHero(selectedHero);
-        setPanelState("enter");
-      }
-    } else {
-      if (renderedHero) {
-        setPanelState("exit");
-        exitTimer.current = setTimeout(() => {
-          setRenderedHero(null);
-          setPanelState("idle");
-        }, 180);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedHero, renderedHero]);
-
-  function handleSelectHero(hero: HeroName | null, dir?: "left" | "right") {
-    if (dir) setPanelDx(dir === "left" ? "-80px" : "80px");
-    setSelectedHero(hero);
-  }
+  const {
+    selectedHero,
+    renderedHero,
+    panelState,
+    panelDx,
+    handleSelectHero,
+  } = useAnimatedHeroPanel();
 
   if (!activeProfile) {
     return (
@@ -106,7 +74,7 @@ export function UserDataPage() {
               type="button"
               onClick={() => {
                 const i = navHeroes.indexOf(renderedHero);
-                if (i > 0) handleSelectHero(navHeroes[i - 1], "left");
+                if (i > 0) handleSelectHero(navHeroes[i - 1]!, "left");
               }}
               disabled={
                 panelState === "exit" || navHeroes.indexOf(renderedHero) <= 0
@@ -145,7 +113,7 @@ export function UserDataPage() {
               onClick={() => {
                 const i = navHeroes.indexOf(renderedHero);
                 if (i >= 0 && i < navHeroes.length - 1)
-                  handleSelectHero(navHeroes[i + 1], "right");
+                  handleSelectHero(navHeroes[i + 1]!, "right");
               }}
               disabled={
                 panelState === "exit" ||

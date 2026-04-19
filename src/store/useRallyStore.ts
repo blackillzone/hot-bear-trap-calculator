@@ -41,7 +41,10 @@ interface RallyStore {
   // ── Profile Actions ───────────────────────────────────────────────────────
   newProfile: (name: string) => void;
   selectProfile: (id: string) => void;
+  /** Mettre à jour le profil actif. Ne pas utiliser pour l'import externe — utiliser importProfile à la place. */
   updateProfile: (partial: Partial<PlayerProfile>) => void;
+  /** Importer un profil depuis l'extérieur (JSON). L'ajoute à la liste et le sélectionne. */
+  importProfile: (profile: PlayerProfile) => void;
   removeProfile: (id: string) => void;
 
   // ── Rally Actions ─────────────────────────────────────────────────────────
@@ -103,10 +106,10 @@ export const useRallyStore = create<RallyStore>()(
     const activeId =
       savedActiveId && initialProfiles.find((p) => p.id === savedActiveId)
         ? savedActiveId
-        : initialProfiles[0].id;
+        : initialProfiles[0]!.id;
 
     const activeProfile =
-      initialProfiles.find((p) => p.id === activeId) ?? initialProfiles[0];
+      initialProfiles.find((p) => p.id === activeId) ?? initialProfiles[0]!
 
     return {
       profiles: initialProfiles,
@@ -169,6 +172,23 @@ export const useRallyStore = create<RallyStore>()(
         });
       },
 
+      importProfile: (profile: PlayerProfile) => {
+        const profiles = upsertProfile(get().profiles, profile);
+        saveProfiles(profiles);
+        saveActiveProfileId(profile.id);
+        const config = {
+          ...get().rallyConfig,
+          capacity: profile.rally_capacity ?? get().rallyConfig.capacity,
+        };
+        set({
+          profiles,
+          activeProfileId: profile.id,
+          activeProfile: profile,
+          rallyConfig: config,
+          result: computeResult(profile, config),
+        });
+      },
+
       removeProfile: (id: string) => {
         const profiles = deleteProfile(get().profiles, id);
         // Ensure at least one profile exists
@@ -177,7 +197,7 @@ export const useRallyStore = create<RallyStore>()(
         if (profiles.length === 0) saveProfiles(finalProfiles);
         else saveProfiles(finalProfiles);
 
-        const newActive = finalProfiles[0];
+        const newActive = finalProfiles[0]!
         saveActiveProfileId(newActive.id);
         set({
           profiles: finalProfiles,
