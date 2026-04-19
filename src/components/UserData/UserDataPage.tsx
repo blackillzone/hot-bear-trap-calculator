@@ -11,7 +11,6 @@ export function UserDataPage() {
   const activeProfile   = useRallyStore(s => s.activeProfile);
   const updateProfile   = useRallyStore(s => s.updateProfile);
   const userDataTab     = useRallyStore(s => s.userDataTab);
-  const setUserDataTab  = useRallyStore(s => s.setUserDataTab);
 
   const [selectedHero,  setSelectedHero]  = useState<HeroName | null>(null);
   // renderedHero stays mounted during the exit animation
@@ -82,7 +81,6 @@ export function UserDataPage() {
           setSelectedHero={handleSelectHero}
           onFilteredHeroesChange={setNavHeroes}
           activeTab={userDataTab}
-          setActiveTab={setUserDataTab}
         />
       </div>
 

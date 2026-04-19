@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRallyStore } from '../../store/useRallyStore';
 import { HERO_DB } from '../../lib/heroes';
 import type { HeroName, OwnedHeroData } from '../../types';
@@ -352,7 +352,6 @@ function MiniInput({
   max: number;
 }) {
   const [display, setDisplay] = useState(String(value));
-  useEffect(() => setDisplay(String(value)), [value]);
   function commit(raw: string) {
     const v = parseInt(raw, 10);
     if (!isNaN(v)) {
@@ -746,6 +745,44 @@ export function HeroRoster({
     }, 140);
   }
 
+  const filteredHeroes = useMemo(() => {
+    if (!activeProfile) return [];
+    
+    const filterByGen = (name: HeroName) => {
+      if (filterGen === 'all') return true;
+      const gen = HERO_DB[name].generation;
+      if (filterGen === 'epic') return gen === 'epic';
+      if (filterGen === 'rare') return gen === 'rare';
+      return String(gen) === filterGen;
+    };
+
+    const filteredGroups = filterClass === 'all'
+      ? (() => {
+          const heroes = ALL_HEROES_SORTED.filter(filterByGen);
+          return heroes.length > 0 ? [{ label: '', accent: '', heroes }] : [];
+        })()
+      : HERO_GROUPS
+          .filter(g => g.label === CLASS_GROUP_LABEL[filterClass])
+          .map(g => ({
+            ...g,
+            heroes: g.heroes
+              .filter(filterByGen)
+              .sort((a, b) => {
+                const ga = heroGenOrder(HERO_DB[a].generation);
+                const gb = heroGenOrder(HERO_DB[b].generation);
+                if (ga !== gb) return ga - gb;
+                return a.localeCompare(b);
+              }),
+          }))
+          .filter(g => g.heroes.length > 0);
+
+    return filteredGroups.flatMap(g => g.heroes);
+  }, [activeProfile, filterClass, filterGen]);
+
+  useEffect(() => {
+    filteredHeroesRef.current = filteredHeroes;
+  }, [filteredHeroes]);
+
   if (!activeProfile) return null;
 
   const ownedHeroes = activeProfile.ownedHeroes ?? {};
@@ -766,6 +803,16 @@ export function HeroRoster({
     }
     const dir: 'left' | 'right' = e.clientX < window.innerWidth / 2 ? 'left' : 'right';
     setSelectedHero(selectedHero === name ? null : name, dir);
+  }
+
+  const allOwned = filteredHeroes.length > 0 && filteredHeroes.every(n => getHeroData(n).owned);
+
+  function toggleAllOwned() {
+    const patch: typeof ownedHeroes = { ...ownedHeroes };
+    for (const name of filteredHeroes) {
+      patch[name] = { ...(patch[name] ?? defaultOwnedHeroData()), owned: !allOwned };
+    }
+    updateProfile({ ownedHeroes: patch });
   }
 
   const filterByGen = (name: HeroName) => {
@@ -795,18 +842,6 @@ export function HeroRoster({
             }),
         }))
         .filter(g => g.heroes.length > 0);
-
-  const filteredHeroes = filteredGroups.flatMap(g => g.heroes);
-  filteredHeroesRef.current = filteredHeroes;
-  const allOwned = filteredHeroes.length > 0 && filteredHeroes.every(n => getHeroData(n).owned);
-
-  function toggleAllOwned() {
-    const patch: typeof ownedHeroes = { ...ownedHeroes };
-    for (const name of filteredHeroes) {
-      patch[name] = { ...(patch[name] ?? defaultOwnedHeroData()), owned: !allOwned };
-    }
-    updateProfile({ ownedHeroes: patch });
-  }
 
   return (
     <div className="flex flex-col gap-3">

@@ -56,13 +56,11 @@ export function GovDataEditor({
   setSelectedHero,
   onFilteredHeroesChange,
   activeTab,
-  setActiveTab,
 }: {
   selectedHero: HeroName | null;
   setSelectedHero: (h: HeroName | null, dir?: 'left' | 'right') => void;
   onFilteredHeroesChange?: (heroes: HeroName[]) => void;
   activeTab: Tab;
-  setActiveTab: (t: Tab) => void;
 }) {
   const activeProfile = useRallyStore(s => s.activeProfile);
 

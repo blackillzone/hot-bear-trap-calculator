@@ -7,6 +7,27 @@ import {
 import { computeParticipantCurve, formatTroops } from '../../lib/formulas';
 import { TrendingUp } from 'lucide-react';
 
+interface DataPoint {
+  participants: number;
+  damageScore: number;
+  troopsPerParticipant: number;
+  fillRate: number;
+  normalizedScore: number;
+}
+
+function CustomTooltip({ active, payload }: { active?: boolean; payload?: { payload: DataPoint }[] }) {
+  if (!active || !payload?.length) return null;
+  const d = payload[0].payload;
+  return (
+    <div className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-xs shadow-xl">
+      <p className="text-gray-300 font-semibold mb-1">{d.participants} participant{d.participants > 1 ? 's' : ''}</p>
+      <p className="text-orange-400">Score: {d.normalizedScore.toFixed(1)}%</p>
+      <p className="text-gray-400">Troops/player: {formatTroops(d.troopsPerParticipant)}</p>
+      <p className="text-gray-400">Rally fill: {(d.fillRate * 100).toFixed(1)}%</p>
+    </div>
+  );
+}
+
 export function ParticipantGraph() {
   const activeProfile = useRallyStore(s => s.activeProfile);
   const config = useRallyStore(s => s.rallyConfig);
@@ -29,19 +50,6 @@ export function ParticipantGraph() {
     ...d,
     normalizedScore: (d.damageScore / maxScore) * 100,
   }));
-
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: { payload: typeof normalized[0] }[] }) => {
-    if (!active || !payload?.length) return null;
-    const d = payload[0].payload;
-    return (
-      <div className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-xs shadow-xl">
-        <p className="text-gray-300 font-semibold mb-1">{d.participants} participant{d.participants > 1 ? 's' : ''}</p>
-        <p className="text-orange-400">Score: {d.normalizedScore.toFixed(1)}%</p>
-        <p className="text-gray-400">Troops/player: {formatTroops(d.troopsPerParticipant)}</p>
-        <p className="text-gray-400">Rally fill: {(d.fillRate * 100).toFixed(1)}%</p>
-      </div>
-    );
-  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-4">
