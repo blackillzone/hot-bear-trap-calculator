@@ -105,29 +105,38 @@ function StarIcon({
         const isFilled = rank < filledCount;
         const isPreview = !isFilled && rank < previewCount;
         return (
-          <path
-            key={rank}
-            d={branchPath(i)}
-            fill={
-              isFilled
-                ? `url(#${gradId})`
-                : isPreview
-                  ? `url(#${previewGradId})`
-                  : "#1f2937"
-            }
-            stroke={isFilled ? "#ea580c" : isPreview ? "#fb923c66" : "#374151"}
-            strokeWidth={0.8}
-            style={{ cursor: "pointer", transition: "fill 80ms" }}
-            onClick={() => onBranchClick(rank + 1)}
-            onKeyDown={(e) => {
-              if (e.key === " " || e.key === "Enter") {
-                e.preventDefault();
-                onBranchClick(rank + 1);
-              }
-            }}
-            onMouseEnter={() => onBranchHover(rank + 1)}
-            onMouseLeave={() => onBranchHover(null)}
-          />
+          <>
+            {/* biome-ignore lint/a11y/useSemanticElements: SVG group cannot use button element */}
+            <g
+              key={rank}
+              role="button"
+              tabIndex={0}
+              onClick={() => onBranchClick(rank + 1)}
+              onKeyDown={(e) => {
+                if (e.key === " " || e.key === "Enter") {
+                  e.preventDefault();
+                  onBranchClick(rank + 1);
+                }
+              }}
+              onMouseEnter={() => onBranchHover(rank + 1)}
+              onMouseLeave={() => onBranchHover(null)}
+              style={{ cursor: "pointer" }}
+            >
+              <path
+                d={branchPath(i)}
+                fill={
+                  isFilled
+                    ? `url(#${gradId})`
+                    : isPreview
+                      ? `url(#${previewGradId})`
+                      : "#1f2937"
+                }
+                stroke={isFilled ? "#ea580c" : isPreview ? "#fb923c66" : "#374151"}
+                strokeWidth={0.8}
+                style={{ transition: "fill 80ms" }}
+              />
+            </g>
+          </>
         );
       })}
       <circle

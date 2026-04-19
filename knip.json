@@ -1,5 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "project": ["src/**/*.{ts,tsx}"],
-  "tags": ["-lintignore"]
+  "project": ["src/**/*.{ts,tsx}", "vite.config.ts", "vitest.config.ts", "playwright.config.ts"],
+  "tags": ["-lintignore"],
+  "ignoreDependencies": ["@tailwindcss/vite", "clsx", "lucide-react", "recharts", "zustand"]
 }

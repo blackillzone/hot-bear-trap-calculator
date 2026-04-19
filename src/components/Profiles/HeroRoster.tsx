@@ -88,6 +88,7 @@ function Tooltip({
   const [visible, setVisible] = useState(false);
   return (
     <div
+      role="tooltip"
       aria-live="polite"
       className="relative inline-flex"
       onMouseEnter={() => setVisible(true)}

@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render } from "@testing-library/react";
 import { RallyConfig } from "./RallyConfig";
 import { useRallyStore } from "../../store/useRallyStore";
 import { resetStore } from "../../test/storeFixture";
