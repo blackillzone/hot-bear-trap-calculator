@@ -83,7 +83,8 @@ describe("useRallyStore - selectProfile", () => {
     store.newProfile("Profile 2");
 
     const state = useRallyStore.getState();
-    const profile1 = state.profiles[0]!;
+    const profile1 = state.profiles.at(0);
+    expect(profile1).toBeDefined();
 
     store.selectProfile(profile1.id);
 
@@ -146,11 +147,13 @@ describe("useRallyStore - updateProfile", () => {
 
     const saved = localStorage.getItem("ks_profiles");
     expect(saved).not.toBeNull();
-    const profiles = JSON.parse(saved!);
-    const active = profiles.find(
-      (p: any) => p.id === useRallyStore.getState().activeProfileId,
-    );
-    expect(active.stats.inf_atk).toBe(150);
+    if (saved) {
+      const profiles = JSON.parse(saved);
+      const active = profiles.find(
+        (p: Record<string, unknown>) => p.id === useRallyStore.getState().activeProfileId,
+      );
+      expect(active?.stats?.inf_atk).toBe(150);
+    }
   });
 });
 
@@ -179,12 +182,15 @@ describe("useRallyStore - removeProfile", () => {
 
     const state = useRallyStore.getState();
     const activeId = state.activeProfileId;
+    expect(activeId).toBeDefined();
 
-    store.removeProfile(activeId!);
+    if (activeId) {
+      store.removeProfile(activeId);
 
-    const updated = useRallyStore.getState();
-    expect(updated.activeProfileId).not.toBe(activeId);
-    expect(updated.activeProfile).not.toBeNull();
+      const updated = useRallyStore.getState();
+      expect(updated.activeProfileId).not.toBe(activeId);
+      expect(updated.activeProfile).not.toBeNull();
+    }
   });
 
   it("should create default profile if all removed", () => {
@@ -418,8 +424,10 @@ describe("useRallyStore - integration scenarios", () => {
     // Simulate store reset by checking localStorage
     const saved = localStorage.getItem("ks_profiles");
     expect(saved).not.toBeNull();
-    const profiles = JSON.parse(saved!);
-    expect(profiles.some((p: any) => p.name === profileName)).toBe(true);
+    if (saved) {
+      const profiles = JSON.parse(saved);
+      expect(profiles.some((p: Record<string, unknown>) => p.name === profileName)).toBe(true);
+    }
 
     const savedActiveId = localStorage.getItem("ks_active_profile");
     expect(savedActiveId).toBe(savedId);

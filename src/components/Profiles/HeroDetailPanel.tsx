@@ -296,7 +296,7 @@ export function HeroDetailPanel({
       <div className="px-3 py-2.5 space-y-2.5 border-t border-gray-800">
         {/* Étoiles interactives */}
         <div className="flex items-center justify-center gap-1">
-          {Array.from({ length: 5 }, (_, s) => {
+          {[0, 1, 2, 3, 4].map((s) => {
             const filledCount = Math.max(0, Math.min(6, total - s * 6));
             const previewCount =
               hoveredPos === null
@@ -308,7 +308,7 @@ export function HeroDetailPanel({
                     : 0;
             return (
               <StarIcon
-                key={`star-${filledCount}-${previewCount}-${s}`}
+                key={`${hero.id}-star-${s}`}
                 index={s}
                 filledCount={filledCount}
                 previewCount={previewCount}

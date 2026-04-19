@@ -23,8 +23,11 @@ function combinationsWithRepetition<T>(pool: T[], k: number): T[][] {
   if (pool.length === 0) return [];
   const result: T[][] = [];
   for (let i = 0; i < pool.length; i++) {
-    const sub = combinationsWithRepetition(pool.slice(i), k - 1);
-    for (const s of sub) result.push([pool[i]!, ...s]);
+    const item = pool.at(i);
+    if (item !== undefined) {
+      const sub = combinationsWithRepetition(pool.slice(i), k - 1);
+      for (const s of sub) result.push([item, ...s]);
+    }
   }
   return result;
 }
@@ -104,7 +107,8 @@ export function JoinerRecommender() {
 
   function applyCombo(joiners: JoinerSlot[]) {
     ([0, 1, 2, 3] as const).forEach((i) => {
-      setJoiner(i, joiners[i]!);
+      const joiner = joiners.at(i);
+      if (joiner) setJoiner(i, joiner);
     });
   }
 
@@ -139,7 +143,8 @@ export function JoinerRecommender() {
         {recommendations.map((rec, idx) => {
           const label = rec.combo.reduce<Record<string, number>>((acc, h) => {
             const current = acc[h] ?? 0;
-            return { ...acc, [h]: current + 1 };
+            acc[h] = current + 1;
+            return acc;
           }, {});
           const labelStr = Object.entries(label)
             .map(([h, n]) => (n > 1 ? `${n}× ${h}` : h))
@@ -155,7 +160,7 @@ export function JoinerRecommender() {
           return (
             <button
               type="button"
-              key={`combo-${idx}-${rec.combo.slice().sort().join("-")}`}
+              key={rec.combo.slice().sort().join("-")}
               onClick={() => applyCombo(rec.joiners)}
               className={`cursor-pointer flex items-center gap-3 rounded-lg px-3 py-2.5 border text-xs transition-colors ${
                 isSelected

@@ -106,10 +106,13 @@ export const useRallyStore = create<RallyStore>()(
     const activeId =
       savedActiveId && initialProfiles.find((p) => p.id === savedActiveId)
         ? savedActiveId
-        : initialProfiles[0]!.id;
+        : initialProfiles.at(0)?.id;
 
-    const activeProfile =
-      initialProfiles.find((p) => p.id === activeId) ?? initialProfiles[0]!
+    if (!activeId) {
+      throw new Error("Unable to set active profile ID");
+    }
+
+    const activeProfile = initialProfiles.find((p) => p.id === activeId) ?? initialProfiles.at(0);
 
     return {
       profiles: initialProfiles,
@@ -197,7 +200,8 @@ export const useRallyStore = create<RallyStore>()(
         if (profiles.length === 0) saveProfiles(finalProfiles);
         else saveProfiles(finalProfiles);
 
-        const newActive = finalProfiles[0]!
+        const newActive = finalProfiles.at(0);
+        if (!newActive) throw new Error("Unable to create profile");
         saveActiveProfileId(newActive.id);
         set({
           profiles: finalProfiles,

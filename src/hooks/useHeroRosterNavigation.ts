@@ -30,10 +30,14 @@ export function useHeroRosterNavigation(
       if (idx === -1) return;
       e.preventDefault();
 
-      if (e.key === "ArrowLeft" && idx > 0)
-        return setSelectedHero(heroes[idx - 1]!, "left");
-      if (e.key === "ArrowRight" && idx < heroes.length - 1)
-        return setSelectedHero(heroes[idx + 1]!, "right");
+      if (e.key === "ArrowLeft" && idx > 0) {
+        const prev = heroes.at(idx - 1);
+        if (prev) return setSelectedHero(prev, "left");
+      }
+      if (e.key === "ArrowRight" && idx < heroes.length - 1) {
+        const next = heroes.at(idx + 1);
+        if (next) return setSelectedHero(next, "right");
+      }
 
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         const card = document.querySelector(`[data-hero="${selectedHero}"]`);
@@ -41,10 +45,13 @@ export function useHeroRosterNavigation(
         const cols = grid
           ? getComputedStyle(grid).gridTemplateColumns.trim().split(/\s+/).length
           : 4;
-        if (e.key === "ArrowUp" && idx - cols >= 0)
-          setSelectedHero(heroes[idx - cols]!, "left");
-        else if (e.key === "ArrowDown" && idx + cols < heroes.length)
-          setSelectedHero(heroes[idx + cols]!, "right");
+        if (e.key === "ArrowUp" && idx - cols >= 0) {
+          const up = heroes.at(idx - cols);
+          if (up) setSelectedHero(up, "left");
+        } else if (e.key === "ArrowDown" && idx + cols < heroes.length) {
+          const down = heroes.at(idx + cols);
+          if (down) setSelectedHero(down, "right");
+        }
       }
     }
     window.addEventListener("keydown", onKeyDown);

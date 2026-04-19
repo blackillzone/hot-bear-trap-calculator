@@ -74,7 +74,10 @@ export function UserDataPage() {
               type="button"
               onClick={() => {
                 const i = navHeroes.indexOf(renderedHero);
-                if (i > 0) handleSelectHero(navHeroes[i - 1]!, "left");
+                if (i > 0) {
+                  const prev = navHeroes.at(i - 1);
+                  if (prev) handleSelectHero(prev, "left");
+                }
               }}
               disabled={
                 panelState === "exit" || navHeroes.indexOf(renderedHero) <= 0
@@ -112,8 +115,10 @@ export function UserDataPage() {
               type="button"
               onClick={() => {
                 const i = navHeroes.indexOf(renderedHero);
-                if (i >= 0 && i < navHeroes.length - 1)
-                  handleSelectHero(navHeroes[i + 1]!, "right");
+                if (i >= 0 && i < navHeroes.length - 1) {
+                  const next = navHeroes.at(i + 1);
+                  if (next) handleSelectHero(next, "right");
+                }
               }}
               disabled={
                 panelState === "exit" ||
